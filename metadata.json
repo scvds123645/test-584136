@@ -1,0 +1,8 @@
+{
+  "name": "AI Tools Suite",
+  "description": "A collection of utility tools including AI Chat and Image Analysis powered by Gemini.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
