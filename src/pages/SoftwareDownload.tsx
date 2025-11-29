@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, Star, Share2, Download, Sparkles, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -313,7 +313,6 @@ const SoftwareDownload = () => {
         await navigator.share({ title: app.name, text: app.description, url });
       } catch (error) {
         console.log("Share cancelled or failed", error);
-        // Fallback intentionally omitted if user cancels, but we could copy here too
       }
     } else {
       copyToClipboard(url);
@@ -368,7 +367,7 @@ const SoftwareDownload = () => {
       description="精选优质应用与资源，安全高速下载"
       backLabel="返回首页"
       showParticles={false}
-      className="bg-slate-50/50" // Base background tone
+      className="bg-slate-50/50"
     >
       {/* Aesthetic decorative background blob */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-100/40 blur-[100px] rounded-full pointer-events-none -z-10" />
