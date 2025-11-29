@@ -6,8 +6,7 @@ import {
   RefreshCw, 
   Check, 
   Hash,
-  Settings2,
-  X
+  Settings2
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +28,7 @@ const NumberGenerator = () => {
     triggerHaptic();
     setIsGenerating(true);
     
+    // 模拟计算延迟
     setTimeout(() => {
       const prefix = "6158";
       const count = 100;
@@ -50,29 +50,11 @@ const NumberGenerator = () => {
       setIsCopied(false);
       setIsGenerating(false);
       
-      // 方案二：生成成功 - 灵动岛风格 (黑色胶囊)
-      toast.custom((t) => (
-        <div className="flex items-center justify-between gap-4 px-5 py-3 bg-slate-950 text-white shadow-2xl shadow-black/20 rounded-full w-full max-w-[340px] mx-auto border border-slate-800 animate-in slide-in-from-top-2 fade-in duration-300">
-          <div className="flex items-center gap-3">
-            {/* 图标区 */}
-            <div className="relative flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full shadow-lg shadow-blue-900/50">
-              <Sparkles className="w-4 h-4 text-white" fill="currentColor" />
-            </div>
-            {/* 文字区 */}
-            <div className="flex flex-col">
-              <span className="font-semibold text-sm tracking-tight">生成成功</span>
-              <span className="text-[11px] text-slate-400">已就绪 {count} 个号码</span>
-            </div>
-          </div>
-          {/* 关闭按钮 */}
-          <button 
-            onClick={() => toast.dismiss(t)} 
-            className="p-1 rounded-full hover:bg-slate-800 text-slate-500 hover:text-white transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      ), { duration: 3000 });
+      // 修改点 1: 使用内置 success 提示
+      toast.success("生成完成", {
+        description: `成功生成 ${count} 个号码，无重复。`,
+        duration: 2000,
+      });
 
     }, 300);
   };
@@ -84,13 +66,8 @@ const NumberGenerator = () => {
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
 
-    // 方案二：复制成功 - 极简深色小胶囊
-    toast.custom((t) => (
-      <div className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900/95 backdrop-blur text-white shadow-xl rounded-full mx-auto animate-in zoom-in-95 fade-in duration-200 border border-slate-800/50">
-        <Check className="w-4 h-4 text-green-400" strokeWidth={3} />
-        <span className="font-medium text-sm">已复制</span>
-      </div>
-    ), { duration: 1500 });
+    // 修改点 2: 使用内置 success 提示
+    toast.success("已复制到剪贴板");
   };
 
   const handleClear = () => {
@@ -98,13 +75,8 @@ const NumberGenerator = () => {
     setResult("");
     setHistoryCount(0);
     
-    // 方案二：清空 - 警示深色胶囊
-    toast.custom((t) => (
-      <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-950 text-white border border-slate-800 shadow-xl rounded-full mx-auto animate-in slide-in-from-bottom-2 fade-in">
-        <Trash2 className="w-4 h-4 text-red-500" />
-        <span className="text-sm font-medium text-slate-200">内容已清空</span>
-      </div>
-    ), { duration: 1500 });
+    // 修改点 3: 使用内置 info 提示
+    toast.info("内容已清空");
   };
 
   return (
