@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Sparkles, 
   Copy, 
@@ -6,7 +6,8 @@ import {
   RefreshCw, 
   Check, 
   Hash,
-  Settings2
+  Settings2,
+  ListOrdered
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,21 +16,22 @@ import PageLayout from "@/components/PageLayout";
 const NumberGenerator = () => {
   const [result, setResult] = useState("");
   const [historyCount, setHistoryCount] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  // 状态管理：用于内联反馈
   const [generateStatus, setGenerateStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
 
   // 震动反馈
   const triggerHaptic = () => {
-    if (navigator.vibrate) navigator.vibrate(10);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
   };
 
   const handleGenerate = () => {
     triggerHaptic();
     setGenerateStatus('loading');
     
-    // 模拟计算延迟，提升体验
     setTimeout(() => {
       const prefix = "6158";
       const count = 100;
@@ -49,21 +51,24 @@ const NumberGenerator = () => {
       setResult(resultString);
       setHistoryCount(newNumbers.length);
       
-      // 设置成功状态，并在2秒后恢复
       setGenerateStatus('success');
       setTimeout(() => setGenerateStatus('idle'), 2000);
-      
-      // 重置复制状态，因为内容变了
       setCopyStatus('idle');
-    }, 300);
+      
+      // 移动端体验优化：生成后自动滚动到结果区域
+      if (window.innerWidth < 768) {
+        // 简单的延时滚动，避免键盘弹出等干扰
+        setTimeout(() => {
+            textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }, 400); // 稍微增加一点时间让动画更明显
   };
 
   const handleCopy = () => {
     if (!result) return;
     triggerHaptic();
     navigator.clipboard.writeText(result);
-    
-    // 设置复制成功状态
     setCopyStatus('copied');
     setTimeout(() => setCopyStatus('idle'), 2000);
   };
@@ -79,184 +84,182 @@ const NumberGenerator = () => {
   return (
     <PageLayout
       title="14位数字生成器"
-      description="批量生成指定前缀的随机数字组合"
-      backLabel="返回工具列表"
+      description="批量生成指定前缀随机数"
+      backLabel="返回"
     >
-      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 p-2 md:p-4 pb-20">
+      <div className="max-w-2xl mx-auto space-y-4 p-3 pb-24 md:p-6 md:pb-10">
         
-        {/* 控制面板 Card */}
-        <Card className="
-          relative overflow-hidden
-          rounded-3xl border-transparent bg-white
-          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-          p-5 md:p-8
-        ">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+        {/* 1. 配置与操作区域 - 移动端更紧凑 */}
+        <Card className="rounded-2xl md:rounded-3xl border-0 shadow-sm bg-white overflow-hidden">
+          <div className="p-4 md:p-6 space-y-5">
             
-            {/* 左侧说明 */}
-            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 md:gap-5 w-full md:w-auto">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
-                <Hash className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+            {/* 标题与图标 */}
+            <div className="flex items-center gap-3 text-slate-700 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                <Settings2 className="w-5 h-5" />
               </div>
-              <div className="space-y-2 md:space-y-1">
-                <h3 className="text-lg md:text-xl font-medium text-slate-800">生成配置</h3>
-                <div className="flex flex-wrap justify-center md:justify-start gap-2 text-xs md:text-sm text-slate-500">
-                  <span className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                    <Settings2 className="w-3 md:w-3.5 h-3 md:h-3.5" />
-                    前缀: <span className="font-semibold text-slate-700">6158</span>
-                  </span>
-                  <span className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                    长度: <span className="font-semibold text-slate-700">14位</span>
-                  </span>
-                  <span className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                    数量: <span className="font-semibold text-slate-700">100</span>
-                  </span>
-                </div>
+              <h3 className="font-semibold text-base md:text-lg">生成配置</h3>
+            </div>
+
+            {/* 参数网格 - 手机端三列排布 */}
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              <div className="bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] md:text-xs text-slate-400 uppercase font-bold tracking-wider mb-0.5">前缀</span>
+                <span className="font-mono text-sm md:text-base font-bold text-slate-700">6158</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] md:text-xs text-slate-400 uppercase font-bold tracking-wider mb-0.5">长度</span>
+                <span className="font-mono text-sm md:text-base font-bold text-slate-700">14位</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 md:p-3 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] md:text-xs text-slate-400 uppercase font-bold tracking-wider mb-0.5">数量</span>
+                <span className="font-mono text-sm md:text-base font-bold text-slate-700">100</span>
               </div>
             </div>
 
-            {/* 右侧操作按钮 - 内联状态变化 */}
+            {/* 生成按钮 - 大尺寸触控区 */}
             <button
               onClick={handleGenerate}
               disabled={generateStatus === 'loading'}
               className={`
-                w-full md:w-auto
-                group relative flex items-center justify-center gap-3 px-8 py-3.5 md:py-4 
-                rounded-2xl md:rounded-full 
-                font-medium text-base md:text-lg
-                transition-all duration-300
-                shadow-[0_4px_14px_rgba(37,99,235,0.3)]
-                hover:shadow-[0_6px_20px_rgba(37,99,235,0.4)]
-                active:scale-[0.98] active:translate-y-0.5
+                w-full relative overflow-hidden
+                flex items-center justify-center gap-2 
+                py-3.5 md:py-4 rounded-xl md:rounded-2xl
+                font-semibold text-sm md:text-base text-white
+                shadow-lg shadow-blue-500/20
+                transition-all duration-200 active:scale-[0.98]
                 ${generateStatus === 'success' 
-                  ? 'bg-green-600 hover:bg-green-700 text-white' 
-                  : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white'}
+                  ? 'bg-green-600' 
+                  : 'bg-blue-600 active:bg-blue-700'}
+                disabled:opacity-80
               `}
             >
-              {/* 图标切换逻辑 */}
-              {generateStatus === 'loading' && (
-                <RefreshCw className="w-5 h-5 animate-spin" />
-              )}
-              {generateStatus === 'success' && (
-                <Check className="w-5 h-5 scale-110" strokeWidth={3} />
-              )}
-              {generateStatus === 'idle' && (
-                <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-              )}
-
-              {/* 文字切换逻辑 */}
-              <span>
-                {generateStatus === 'loading' && '生成中...'}
-                {generateStatus === 'success' && '生成成功'}
-                {generateStatus === 'idle' && '立即生成'}
-              </span>
+              <div className="relative z-10 flex items-center gap-2">
+                {generateStatus === 'loading' ? (
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                ) : generateStatus === 'success' ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  <Sparkles className="w-5 h-5 fill-white/20" />
+                )}
+                <span>
+                  {generateStatus === 'loading' && '正在计算...'}
+                  {generateStatus === 'success' && '生成完毕'}
+                  {generateStatus === 'idle' && '立即生成 100 个号码'}
+                </span>
+              </div>
             </button>
           </div>
         </Card>
 
-        {/* 结果显示区域 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* 2. 结果区域 - 整合了统计和操作 */}
+        <Card className={`
+          relative flex flex-col
+          rounded-2xl md:rounded-3xl border-0 shadow-sm bg-white
+          transition-all duration-500
+          ${result ? 'opacity-100 translate-y-0' : 'opacity-95'}
+        `}>
           
-          {/* 左侧：统计与提示 */}
-          <Card className="
-            lg:col-span-1 h-fit
-            rounded-3xl border-transparent bg-slate-50
-            p-5 space-y-5
-          ">
-            {/* 统计数字 */}
-            <div className="flex flex-row lg:flex-col items-center justify-between lg:justify-start lg:items-start gap-4">
-              <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 lg:mb-4">当前结果</h4>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl md:text-4xl font-bold text-slate-800 tabular-nums">
-                    {historyCount}
-                  </span>
-                  <span className="text-xs md:text-sm text-slate-500">个</span>
-                </div>
-              </div>
-              
-              <div className="lg:hidden w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-500">
-                <Sparkles className="w-5 h-5" />
-              </div>
+          {/* 结果区域头部：显示数量 */}
+          <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-slate-100">
+            <div className="flex items-center gap-2 text-slate-500">
+              <ListOrdered className="w-4 h-4" />
+              <span className="text-sm font-medium">生成结果</span>
             </div>
-
-            {/* 功能提示 */}
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
-              <div className="flex flex-col lg:flex-row items-center lg:items-center gap-2 lg:gap-3 text-xs md:text-sm text-slate-600 p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
-                  <Sparkles className="w-3 h-3 lg:w-4 lg:h-4" />
-                </div>
-                <span className="text-center lg:text-left">随机不重复</span>
+            
+            {historyCount > 0 && (
+              <div className="flex items-baseline gap-1 animate-in fade-in zoom-in duration-300">
+                <span className="text-lg font-bold text-blue-600 tabular-nums">
+                  {historyCount}
+                </span>
+                <span className="text-xs text-slate-400">个</span>
               </div>
-              <div className="flex flex-col lg:flex-row items-center lg:items-center gap-2 lg:gap-3 text-xs md:text-sm text-slate-600 p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
-                  <Copy className="w-3 h-3 lg:w-4 lg:h-4" />
-                </div>
-                <span className="text-center lg:text-left">一键全复制</span>
-              </div>
-            </div>
-          </Card>
+            )}
+          </div>
 
-          {/* 右侧：文本输出区域 */}
-          <Card className="
-            lg:col-span-2 relative
-            rounded-3xl border-transparent bg-white
-            shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-            p-1
-          ">
-            {/* 浮动工具栏 - 内联反馈 */}
-            <div className="absolute top-3 right-3 z-10 flex items-center gap-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm">
-              <button
-                onClick={handleCopy}
-                disabled={!result}
-                className={`
-                  flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300
-                  ${copyStatus === 'copied' 
-                    ? 'bg-green-100 text-green-700' 
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'}
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  active:scale-95
-                `}
-              >
-                {/* 复制按钮的内联状态切换 */}
-                {copyStatus === 'copied' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copyStatus === 'copied' ? '已复制' : '复制'}
-              </button>
-              
-              <div className="w-px h-4 bg-slate-200 mx-0.5" />
-
-              <button
-                onClick={handleClear}
-                disabled={!result}
-                className="
-                  p-1.5 md:p-2 rounded-full text-slate-400 
-                  hover:bg-red-50 hover:text-red-500 
-                  transition-all disabled:opacity-30 disabled:cursor-not-allowed
-                  active:scale-90
-                "
-                title="清空"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* 文本框 */}
+          {/* 文本区域 */}
+          <div className="relative group bg-slate-50/50 min-h-[300px]">
             <Textarea 
+              ref={textareaRef}
               value={result}
               readOnly
-              placeholder="生成结果将显示在这里..."
+              placeholder="点击上方按钮生成数字..."
               className="
-                w-full h-[350px] md:h-[450px] 
-                p-5 md:p-6 
-                pt-16 md:pt-16 
-                resize-none
-                border-none focus-visible:ring-0 
-                bg-transparent text-slate-700 font-mono text-base leading-relaxed
-                rounded-3xl
+                w-full h-[400px] md:h-[500px]
+                p-4 md:p-6 pb-20 
+                resize-none border-0 focus-visible:ring-0 
+                bg-transparent 
+                font-mono text-sm md:text-base leading-relaxed text-slate-700
               "
             />
-          </Card>
-        </div>
+
+            {/* 空状态占位图 - 仅在无结果时显示 */}
+            {!result && generateStatus !== 'loading' && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 pointer-events-none">
+                <Hash className="w-16 h-16 mb-2 opacity-20" />
+                <span className="text-sm">暂无数据</span>
+              </div>
+            )}
+
+            {/* 3. 浮动操作栏 - 移至下方，拇指操作区 */}
+            <div className={`
+              absolute bottom-4 left-4 right-4 md:left-auto md:right-6
+              flex items-center justify-between md:justify-end gap-3
+              transition-all duration-300 transform
+              ${result ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}
+            `}>
+              {/* 清空按钮 - 弱化显示 */}
+              <button
+                onClick={handleClear}
+                className="
+                  flex-1 md:flex-none md:w-auto
+                  flex items-center justify-center gap-2
+                  px-4 py-3 md:py-2.5
+                  rounded-xl bg-white border border-slate-200 shadow-sm
+                  text-slate-500 text-sm font-medium
+                  active:bg-slate-50 active:scale-95 transition-all
+                "
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="md:hidden">清空</span>
+              </button>
+
+              {/* 复制按钮 - 强化显示 */}
+              <button
+                onClick={handleCopy}
+                className={`
+                  flex-[2] md:flex-none
+                  flex items-center justify-center gap-2
+                  px-6 py-3 md:py-2.5
+                  rounded-xl shadow-lg shadow-blue-500/10
+                  text-sm font-bold
+                  transition-all duration-300 active:scale-95
+                  ${copyStatus === 'copied'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-slate-900 text-white'}
+                `}
+              >
+                {copyStatus === 'copied' ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>已复制</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>一键复制全部</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </Card>
+
+        {/* 底部提示文字 */}
+        <p className="text-center text-xs text-slate-400 px-4">
+          生成结果已自动去重 • 仅用于测试用途
+        </p>
+
       </div>
     </PageLayout>
   );
