@@ -11,13 +11,14 @@ import {
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import PageLayout from "@/components/PageLayout";
-import { toast } from "sonner"; 
 
 const NumberGenerator = () => {
   const [result, setResult] = useState("");
-  const [isCopied, setIsCopied] = useState(false);
   const [historyCount, setHistoryCount] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // 状态管理：用于内联反馈
+  const [generateStatus, setGenerateStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
 
   // 震动反馈
   const triggerHaptic = () => {
@@ -26,9 +27,9 @@ const NumberGenerator = () => {
 
   const handleGenerate = () => {
     triggerHaptic();
-    setIsGenerating(true);
+    setGenerateStatus('loading');
     
-    // 模拟计算延迟
+    // 模拟计算延迟，提升体验
     setTimeout(() => {
       const prefix = "6158";
       const count = 100;
@@ -47,15 +48,13 @@ const NumberGenerator = () => {
       const resultString = newNumbers.join("\n");
       setResult(resultString);
       setHistoryCount(newNumbers.length);
-      setIsCopied(false);
-      setIsGenerating(false);
       
-      // 修改点 1: 使用内置 success 提示
-      toast.success("生成完成", {
-        description: `成功生成 ${count} 个号码，无重复。`,
-        duration: 2000,
-      });
-
+      // 设置成功状态，并在2秒后恢复
+      setGenerateStatus('success');
+      setTimeout(() => setGenerateStatus('idle'), 2000);
+      
+      // 重置复制状态，因为内容变了
+      setCopyStatus('idle');
     }, 300);
   };
 
@@ -63,20 +62,18 @@ const NumberGenerator = () => {
     if (!result) return;
     triggerHaptic();
     navigator.clipboard.writeText(result);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-
-    // 修改点 2: 使用内置 success 提示
-    toast.success("已复制到剪贴板");
+    
+    // 设置复制成功状态
+    setCopyStatus('copied');
+    setTimeout(() => setCopyStatus('idle'), 2000);
   };
 
   const handleClear = () => {
     triggerHaptic();
     setResult("");
     setHistoryCount(0);
-    
-    // 修改点 3: 使用内置 info 提示
-    toast.info("内容已清空");
+    setCopyStatus('idle');
+    setGenerateStatus('idle');
   };
 
   return (
@@ -118,24 +115,41 @@ const NumberGenerator = () => {
               </div>
             </div>
 
-            {/* 右侧操作按钮 */}
+            {/* 右侧操作按钮 - 内联状态变化 */}
             <button
               onClick={handleGenerate}
-              disabled={isGenerating}
-              className="
+              disabled={generateStatus === 'loading'}
+              className={`
                 w-full md:w-auto
                 group relative flex items-center justify-center gap-3 px-8 py-3.5 md:py-4 
-                bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400
-                text-white rounded-2xl md:rounded-full 
+                rounded-2xl md:rounded-full 
                 font-medium text-base md:text-lg
-                transition-all duration-200
+                transition-all duration-300
                 shadow-[0_4px_14px_rgba(37,99,235,0.3)]
                 hover:shadow-[0_6px_20px_rgba(37,99,235,0.4)]
                 active:scale-[0.98] active:translate-y-0.5
-              "
+                ${generateStatus === 'success' 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white'}
+              `}
             >
-              <RefreshCw className={`w-5 h-5 ${isGenerating ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-500`} />
-              <span>{isGenerating ? '生成中...' : '立即生成'}</span>
+              {/* 图标切换逻辑 */}
+              {generateStatus === 'loading' && (
+                <RefreshCw className="w-5 h-5 animate-spin" />
+              )}
+              {generateStatus === 'success' && (
+                <Check className="w-5 h-5 scale-110" strokeWidth={3} />
+              )}
+              {generateStatus === 'idle' && (
+                <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+              )}
+
+              {/* 文字切换逻辑 */}
+              <span>
+                {generateStatus === 'loading' && '生成中...'}
+                {generateStatus === 'success' && '生成成功'}
+                {generateStatus === 'idle' && '立即生成'}
+              </span>
             </button>
           </div>
         </Card>
@@ -190,22 +204,23 @@ const NumberGenerator = () => {
             shadow-[0_2px_12px_rgba(0,0,0,0.06)]
             p-1
           ">
-            {/* 浮动工具栏 */}
+            {/* 浮动工具栏 - 内联反馈 */}
             <div className="absolute top-3 right-3 z-10 flex items-center gap-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm">
               <button
                 onClick={handleCopy}
                 disabled={!result}
                 className={`
-                  flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all
-                  ${isCopied 
+                  flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300
+                  ${copyStatus === 'copied' 
                     ? 'bg-green-100 text-green-700' 
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'}
                   disabled:opacity-50 disabled:cursor-not-allowed
                   active:scale-95
                 `}
               >
-                {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {isCopied ? '成功' : '复制'}
+                {/* 复制按钮的内联状态切换 */}
+                {copyStatus === 'copied' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copyStatus === 'copied' ? '已复制' : '复制'}
               </button>
               
               <div className="w-px h-4 bg-slate-200 mx-0.5" />
