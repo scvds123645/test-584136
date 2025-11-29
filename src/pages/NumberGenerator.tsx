@@ -5,22 +5,20 @@ import {
   Trash2, 
   CheckCircle2, 
   Settings2,
-  Users, // 改用 Users 图标，更贴合账号UID场景
-  ListOrdered,
+  Users,
   Check,
-  Fingerprint
+  Lock // 新增 Lock 图标，表示数量已锁定
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import PageLayout from "@/components/PageLayout";
 
 const NumberGenerator = () => {
   // --- 配置状态 ---
-  // FB UID 常用号段 (根据需求限定)
   const ALLOWED_PREFIXES = ["6155", "6156", "6157", "6158"];
+  const FIXED_COUNT = 99; // 核心修改：固定数量为 99
   
   const [config, setConfig] = useState({
-    prefix: "6158", 
-    count: 100
+    prefix: "6158"
   });
 
   // --- 核心数据状态 ---
@@ -42,26 +40,12 @@ const NumberGenerator = () => {
     }
   };
 
-  // 处理前缀切换
   const handlePrefixSelect = (prefix: string) => {
     triggerHaptic('light');
-    setConfig(prev => ({ ...prev, prefix }));
-  };
-
-  // 处理数量变化
-  const handleCountChange = (value: string) => {
-    let num = parseInt(value);
-    if (isNaN(num)) num = 0;
-    if (num > 5000) num = 5000; 
-    setConfig(prev => ({ ...prev, count: num }));
+    setConfig({ prefix });
   };
 
   const handleGenerate = () => {
-    if (config.count <= 0) {
-      alert("生成数量必须大于0");
-      return;
-    }
-
     triggerHaptic('medium');
     setStatus('generating');
     setResultList([]);
@@ -81,12 +65,12 @@ const NumberGenerator = () => {
 
     const finishGeneration = () => {
       const prefix = config.prefix;
-      const count = config.count;
       const totalLength = 14; 
       const randomLength = totalLength - prefix.length; 
 
       let newNumbers = [];
-      for (let i = 0; i < count; i++) {
+      // 核心修改：使用固定的 FIXED_COUNT (99)
+      for (let i = 0; i < FIXED_COUNT; i++) {
         let randomPart = "";
         for (let j = 0; j < randomLength; j++) {
           randomPart += Math.floor(Math.random() * 10).toString();
@@ -128,10 +112,10 @@ const NumberGenerator = () => {
   return (
     <PageLayout
       title="FB UID 生成器"
-      description="批量生成指定号段的 Facebook 账户 ID"
+      description="批量生成 99 个 Facebook 账户 ID"
       backLabel="返回"
     >
-      {/* Toast */}
+      {/* Toast 提示 */}
       <div className={`
         fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none
         flex items-center gap-2 px-4 py-2 rounded-full
@@ -140,7 +124,7 @@ const NumberGenerator = () => {
         ${showToast ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'}
       `}>
         <CheckCircle2 className="w-4 h-4 text-green-400" />
-        <span className="text-xs font-medium">UID 已复制</span>
+        <span className="text-xs font-medium">99 个 UID 已复制</span>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-4 p-3 pb-32 md:p-6">
@@ -150,18 +134,24 @@ const NumberGenerator = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none opacity-60" />
 
           <div className="p-5 md:p-6 relative z-10">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-blue-600" />
                 生成参数
               </h2>
-              <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
-                 <span className="text-xs font-semibold text-slate-500">ID长度: 14位</span>
+              <div className="flex gap-2">
+                <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-slate-500">14位</span>
+                </div>
+                {/* 锁定数量的视觉提示 */}
+                <div className="bg-orange-50 border border-orange-100 px-3 py-1 rounded-full flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-orange-400" />
+                  <span className="text-xs font-semibold text-orange-600">固定 99个</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              
+            <div className="space-y-8">
               {/* 号段选择器 */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -194,62 +184,40 @@ const NumberGenerator = () => {
                 </div>
               </div>
 
-              {/* 数量输入 */}
-              <div className="space-y-3">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <ListOrdered className="w-3 h-3" /> 生成数量
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    pattern="\d*"
-                    value={config.count}
-                    onChange={(e) => handleCountChange(e.target.value)}
-                    className="
-                      w-full bg-slate-50 border border-slate-200 
-                      rounded-xl py-3 px-3 
-                      text-lg font-mono font-bold text-slate-800 
-                      focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                      transition-all
-                    "
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
-                    个 UID
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 底部生成按钮 */}
-            <div className="mt-8">
-              <button
-                onClick={handleGenerate}
-                disabled={status === 'generating'}
-                className="w-full relative group"
-              >
-                <div className={`
-                  relative overflow-hidden
-                  w-full py-3.5 rounded-xl
-                  flex items-center justify-center gap-2
-                  transition-all duration-300
-                  ${status === 'generating' ? 'bg-slate-100 cursor-wait' : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-[0.98]'}
-                `}>
-                  {status === 'generating' ? (
-                    <div className="flex flex-col items-center w-full px-4">
-                      <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden mt-1">
-                        <div className="h-full bg-blue-500 transition-all duration-75 ease-out rounded-full" style={{ width: `${progress}%` }} />
+              {/* 生成按钮 */}
+              <div>
+                <button
+                  onClick={handleGenerate}
+                  disabled={status === 'generating'}
+                  className="w-full relative group"
+                >
+                  <div className={`
+                    relative overflow-hidden
+                    w-full py-4 rounded-xl
+                    flex items-center justify-center gap-2
+                    transition-all duration-300
+                    ${status === 'generating' ? 'bg-slate-100 cursor-wait' : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-[0.98]'}
+                  `}>
+                    {status === 'generating' ? (
+                      <div className="flex flex-col items-center w-full px-4">
+                        <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden mt-1">
+                          <div className="h-full bg-blue-500 transition-all duration-75 ease-out rounded-full" style={{ width: `${progress}%` }} />
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5 text-white/90" />
-                      <span className="text-base font-semibold text-white">
-                        生成 {config.prefix} 开头 UID
-                      </span>
-                    </>
-                  )}
-                </div>
-              </button>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5 text-white/90" />
+                        <span className="text-base font-semibold text-white">
+                          生成 99 个 UID ({config.prefix})
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </button>
+                <p className="text-center text-xs text-slate-400 mt-3">
+                  * 系统已限制单次生成数量为 99 个
+                </p>
+              </div>
             </div>
           </div>
         </Card>
@@ -269,8 +237,8 @@ const NumberGenerator = () => {
                 </span>
               </div>
               {historyCount > 0 && (
-                <div className="text-xs font-mono text-slate-400">
-                  Total: {historyCount}
+                <div className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                  {historyCount} 个
                 </div>
               )}
             </div>
@@ -310,7 +278,7 @@ const NumberGenerator = () => {
                   <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-3">
                     <Users className="w-8 h-8 opacity-20" />
                   </div>
-                  <p className="text-sm">配置后生成 FB UID</p>
+                  <p className="text-sm">点击生成 99 个账户</p>
                 </div>
               )}
             </div>
@@ -349,7 +317,7 @@ const NumberGenerator = () => {
             "
           >
             <Copy className="w-5 h-5" />
-            <span>一键复制 UID</span>
+            <span>一键复制 (99个)</span>
           </button>
         </div>
       </div>
