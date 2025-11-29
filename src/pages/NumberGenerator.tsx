@@ -5,20 +5,21 @@ import {
   Trash2, 
   CheckCircle2, 
   Settings2,
-  Cpu,
+  Users, // 改用 Users 图标，更贴合账号UID场景
   ListOrdered,
-  Check
+  Check,
+  Fingerprint
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import PageLayout from "@/components/PageLayout";
 
 const NumberGenerator = () => {
   // --- 配置状态 ---
-  // 仅允许的号段列表
+  // FB UID 常用号段 (根据需求限定)
   const ALLOWED_PREFIXES = ["6155", "6156", "6157", "6158"];
   
   const [config, setConfig] = useState({
-    prefix: "6158", // 默认选中最后一个
+    prefix: "6158", 
     count: 100
   });
 
@@ -51,7 +52,7 @@ const NumberGenerator = () => {
   const handleCountChange = (value: string) => {
     let num = parseInt(value);
     if (isNaN(num)) num = 0;
-    if (num > 5000) num = 5000; // 性能保护限制
+    if (num > 5000) num = 5000; 
     setConfig(prev => ({ ...prev, count: num }));
   };
 
@@ -82,7 +83,7 @@ const NumberGenerator = () => {
       const prefix = config.prefix;
       const count = config.count;
       const totalLength = 14; 
-      const randomLength = totalLength - prefix.length; // 固定为 10位随机
+      const randomLength = totalLength - prefix.length; 
 
       let newNumbers = [];
       for (let i = 0; i < count; i++) {
@@ -126,8 +127,8 @@ const NumberGenerator = () => {
 
   return (
     <PageLayout
-      title="号段生成器"
-      description="6155 - 6158 专属随机号码生成"
+      title="FB UID 生成器"
+      description="批量生成指定号段的 Facebook 账户 ID"
       backLabel="返回"
     >
       {/* Toast */}
@@ -139,7 +140,7 @@ const NumberGenerator = () => {
         ${showToast ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'}
       `}>
         <CheckCircle2 className="w-4 h-4 text-green-400" />
-        <span className="text-xs font-medium">已复制到剪贴板</span>
+        <span className="text-xs font-medium">UID 已复制</span>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-4 p-3 pb-32 md:p-6">
@@ -152,19 +153,19 @@ const NumberGenerator = () => {
             <div className="flex justify-between items-start mb-6">
               <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-blue-600" />
-                生成配置
+                生成参数
               </h2>
               <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
-                 <span className="text-xs font-semibold text-slate-500">总长度: 14位</span>
+                 <span className="text-xs font-semibold text-slate-500">ID长度: 14位</span>
               </div>
             </div>
 
             <div className="space-y-6">
               
-              {/* 号段选择器：取代原本的输入框 */}
+              {/* 号段选择器 */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  选择号段 (Prefix)
+                  选择 UID 前缀
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {ALLOWED_PREFIXES.map((p) => {
@@ -196,7 +197,7 @@ const NumberGenerator = () => {
               {/* 数量输入 */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <ListOrdered className="w-3 h-3" /> 生成数量 (Count)
+                  <ListOrdered className="w-3 h-3" /> 生成数量
                 </label>
                 <div className="relative">
                   <input
@@ -213,7 +214,7 @@ const NumberGenerator = () => {
                     "
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
-                    个
+                    个 UID
                   </div>
                 </div>
               </div>
@@ -243,7 +244,7 @@ const NumberGenerator = () => {
                     <>
                       <Sparkles className="w-5 h-5 text-white/90" />
                       <span className="text-base font-semibold text-white">
-                        生成 {config.prefix} 号段
+                        生成 {config.prefix} 开头 UID
                       </span>
                     </>
                   )}
@@ -264,7 +265,7 @@ const NumberGenerator = () => {
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${status === 'success' ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
                 <span className="text-sm font-medium text-slate-600">
-                  {status === 'success' ? `已生成 (前缀: ${config.prefix})` : '结果列表'}
+                  {status === 'success' ? `UID 列表 (${config.prefix})` : '等待生成...'}
                 </span>
               </div>
               {historyCount > 0 && (
@@ -295,7 +296,7 @@ const NumberGenerator = () => {
                         {index + 1}
                       </div>
                       
-                      {/* 数字内容：高亮前缀部分 */}
+                      {/* UID 内容 */}
                       <div className="pl-4 py-2 font-mono text-[15px] tracking-wider text-slate-700">
                         <span className="font-bold text-blue-600">{config.prefix}</span>
                         <span className="text-slate-600">{num.substring(4)}</span>
@@ -307,9 +308,9 @@ const NumberGenerator = () => {
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 pointer-events-none">
                   <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-3">
-                    <Cpu className="w-8 h-8 opacity-20" />
+                    <Users className="w-8 h-8 opacity-20" />
                   </div>
-                  <p className="text-sm">选择号段后点击生成</p>
+                  <p className="text-sm">配置后生成 FB UID</p>
                 </div>
               )}
             </div>
@@ -348,7 +349,7 @@ const NumberGenerator = () => {
             "
           >
             <Copy className="w-5 h-5" />
-            <span>复制全部 ({historyCount})</span>
+            <span>一键复制 UID</span>
           </button>
         </div>
       </div>
