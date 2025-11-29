@@ -13,7 +13,7 @@ import {
   Sparkles, 
   Store, 
   ArrowRight,
-  ChevronRight, // 新增：用于手机端列表视图的箭头
+  ChevronRight,
   Binary
 } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
@@ -25,15 +25,15 @@ const Tools = () => {
     {
       path: "/14",
       icon: Hash,
-      title: "14位数字提取", // 稍微精简标题以适应手机
+      title: "14位数字提取",
       description: "自动从文本中提取并去重14位连续数字",
       external: false,
     },
     {
       path: "/14d",
       icon: Binary,
-      title: "14位数字生成",
-      description: "批量生成6158开头的14位随机数字",
+      title: "FB UID 生成器",
+      description: "批量生成 99 个 Facebook 账户 ID",
       external: false,
     },
     {
@@ -108,11 +108,6 @@ const Tools = () => {
       description="选择下方工具，快速完成各种数据处理任务"
       backLabel="返回首页"
     >
-      {/* 
-        Grid Layout Optimization:
-        - Mobile: grid-cols-1, gap-3 (tighter)
-        - Tablet/Desktop: grid-cols-2/3, gap-6 (spacious)
-      */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 p-1 sm:p-2">
         {tools.map((tool) => {
           const IconComponent = tool.icon;
@@ -122,81 +117,86 @@ const Tools = () => {
               key={tool.path}
               onClick={() => handleNavigation(tool.path, tool.external)}
               className="
-                relative group cursor-pointer overflow-hidden
-                /* Base styles (Mobile First) */
-                rounded-2xl border-transparent bg-white
-                shadow-[0_1px_3px_rgba(0,0,0,0.05)] 
-                p-4
-                /* Hover & Desktop styles */
-                sm:rounded-3xl sm:p-6
-                sm:shadow-[0_2px_12px_rgba(0,0,0,0.06)] 
-                hover:shadow-[0_4px_20px_rgba(0,0,0,0.1)]
-                hover:bg-blue-50/30
-                sm:hover:-translate-y-1
-                transition-all duration-300 ease-[cubic-bezier(0.2,0.0,0,1.0)]
+                group relative cursor-pointer overflow-hidden
+                /* 基础质感：纯白背景 + 极细微边框 + 柔和阴影 */
+                bg-white border border-slate-200/60
+                rounded-2xl sm:rounded-3xl
+                shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)]
+                
+                /* 交互反馈：悬浮时阴影变蓝、轻微上浮、边框变色 */
+                hover:shadow-[0_12px_32px_-8px_rgba(59,130,246,0.12)]
+                hover:border-blue-400/30
+                hover:-translate-y-[2px]
+                
+                transition-all duration-300 ease-out
+                p-4 sm:p-6
               "
             >
-              {/* Ripple Effect Layer */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.03] bg-blue-600 transition-opacity duration-300 pointer-events-none" />
+              {/* 装饰：Hover 时顶部出现的极光渐变条 */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/0 via-blue-500/40 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              {/* 背景装饰：Hover 时右下角出现的大淡色圆圈 */}
+              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-              {/* 
-                Flex Layout Shift:
-                - Mobile: Row (Icon Left -> Text Middle -> Arrow Right)
-                - Desktop: Column (Icon Top -> Text Middle -> Button Bottom)
-              */}
-              <div className="flex flex-row items-center sm:flex-col sm:items-start sm:h-full gap-4 sm:gap-5">
+              <div className="relative flex flex-row items-center sm:flex-col sm:items-start sm:h-full gap-4 sm:gap-5 z-10">
                 
-                {/* Icon Container */}
+                {/* 图标容器：增加微渐变和内描边，提升精致度 */}
                 <div className="
                   shrink-0 flex items-center justify-center
                   rounded-xl sm:rounded-2xl 
                   w-12 h-12 sm:w-14 sm:h-14 
-                  bg-blue-50 text-blue-600 
-                  group-hover:scale-105 sm:group-hover:scale-110 
-                  group-hover:bg-blue-100 
-                  transition-all duration-300
+                  
+                  /* 质感填充 */
+                  bg-gradient-to-br from-blue-50 to-indigo-50/50
+                  border border-blue-100/60
+                  shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)]
+                  
+                  text-blue-600 
+                  group-hover:scale-105 group-hover:from-blue-100 group-hover:to-blue-50
+                  transition-transform duration-300
                 ">
-                  <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2} />
+                  <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 opacity-90" strokeWidth={1.5} />
                 </div>
 
-                {/* Content Area */}
-                <div className="flex-1 min-w-0 space-y-1 sm:space-y-2">
+                {/* 文本区域 */}
+                <div className="flex-1 min-w-0 space-y-1 sm:space-y-2.5">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-base sm:text-xl text-slate-800 truncate group-hover:text-blue-700 transition-colors">
+                    <h3 className="font-semibold text-[15px] sm:text-lg text-slate-800 truncate tracking-tight group-hover:text-blue-700 transition-colors">
                       {tool.title}
                     </h3>
-                    {/* External Icon (Mobile: Inline / Desktop: Corner) */}
                     {tool.external && (
                       <ExternalLink className="w-3 h-3 text-slate-400 sm:hidden" />
                     )}
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-500 leading-snug line-clamp-2">
+                  <p className="text-xs sm:text-[13px] text-slate-500 leading-snug line-clamp-2 font-normal">
                     {tool.description}
                   </p>
                 </div>
 
-                {/* Action Area (Responsive) */}
-                <div className="shrink-0 sm:mt-auto sm:w-full sm:pt-2">
-                  {/* Mobile: Simple Chevron */}
-                  <div className="sm:hidden text-slate-300 group-hover:text-blue-500 transition-colors">
+                {/* 操作区域 */}
+                <div className="shrink-0 sm:mt-auto sm:w-full sm:pt-3">
+                  {/* 手机端：深色箭头 */}
+                  <div className="sm:hidden text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all">
                     <ChevronRight className="w-5 h-5" />
                   </div>
 
-                  {/* Desktop: Pill Button */}
-                  <span className="
-                    hidden sm:inline-flex items-center gap-2 px-4 py-2 
-                    rounded-full text-sm font-medium
-                    bg-blue-50 text-blue-700 
-                    group-hover:bg-blue-600 group-hover:text-white
+                  {/* 桌面端：胶囊按钮 */}
+                  <div className="
+                    hidden sm:flex items-center gap-2 
+                    text-sm font-medium
+                    text-blue-600/90 
+                    group-hover:text-blue-700
                     transition-colors duration-300
                   ">
-                    {tool.external ? '访问链接' : '立即使用'}
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
+                    <span className="relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-blue-600 after:transition-all after:duration-300 group-hover:after:w-full">
+                      {tool.external ? '访问链接' : '立即使用'}
+                    </span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                   
-                  {/* Desktop: External Indicator (Absolute positioned) */}
+                  {/* 桌面端：右上角角标 */}
                   {tool.external && (
-                    <div className="hidden sm:block absolute top-6 right-6 p-2 rounded-full bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                    <div className="hidden sm:block absolute top-6 right-6 text-slate-300 group-hover:text-blue-400 transition-colors">
                       <ExternalLink className="w-4 h-4" />
                     </div>
                   )}
@@ -207,43 +207,40 @@ const Tools = () => {
         })}
       </div>
 
-      {/* Footer Info Card - Condensed for Mobile */}
-      <div className="mt-6 sm:mt-10 pb-6">
+      {/* 底部提示卡片：毛玻璃质感 */}
+      <div className="mt-8 sm:mt-12 pb-8">
         <Card className="
-          border-none rounded-2xl sm:rounded-3xl 
-          bg-slate-50 
-          p-5 sm:p-8
+          relative overflow-hidden
+          border border-indigo-100/50
+          rounded-2xl sm:rounded-3xl 
+          bg-gradient-to-br from-slate-50/80 to-indigo-50/30
+          backdrop-blur-sm
+          p-6 sm:p-8
         ">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 sm:gap-6">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-5 sm:gap-8">
             <div className="
               w-10 h-10 sm:w-12 sm:h-12 
-              rounded-full bg-white shadow-sm 
+              rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-white/50
               flex items-center justify-center shrink-0 text-blue-600
             ">
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 fill-blue-50" />
             </div>
 
-            <div className="flex-1 space-y-2 sm:space-y-2 w-full">
-              <h3 className="text-base sm:text-lg font-medium text-slate-800">使用提示</h3>
+            <div className="flex-1 space-y-3 w-full">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 tracking-tight">使用小贴士</h3>
               
-              {/* Grid layout for tips on mobile for better density */}
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-600">
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-                  支持批量处理
-                </span>
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-                  本地数据安全
-                </span>
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-                  一键复制结果
-                </span>
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-                  多端完美适配
-                </span>
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-6 gap-y-3 text-xs sm:text-sm text-slate-600">
+                {[
+                  "支持批量处理",
+                  "本地数据安全",
+                  "一键复制结果",
+                  "多端完美适配"
+                ].map((tip, i) => (
+                  <span key={i} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 shadow-[0_0_8px_rgba(96,165,250,0.6)]" />
+                    {tip}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
