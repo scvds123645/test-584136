@@ -16,7 +16,10 @@ import {
   ArrowRight,
   ChevronRight,
   Binary,
-  Loader2 // 新增 Loading 图标
+  Loader2,
+  ShieldCheck,
+  Zap,
+  Globe
 } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
@@ -105,15 +108,13 @@ const Tools = () => {
     // 2. 设置当前点击的卡片进入 Loading 态
     setLoadingPath(path);
 
-    // 3. 添加 250ms 延迟，让用户看清点击反馈动画 (按压效果 + Loading圈)
-    // 这个时间经过调试，能平衡"跟手感"和"响应速度"
+    // 3. 添加 250ms 延迟，让用户看清点击反馈动画
     setTimeout(() => {
       if (isExternal) {
         window.open(path, '_blank');
-        setLoadingPath(null); // 外部链接跳转后需重置状态，因为页面没有刷新
+        setLoadingPath(null); // 外部链接跳转后需重置状态
       } else {
         navigate(path);
-        // 内部路由跳转通常会卸载组件，但也重置以防万一
         setLoadingPath(null); 
       }
     }, 250); 
@@ -141,14 +142,14 @@ const Tools = () => {
                 transition-all duration-200 ease-out
                 p-4 sm:p-6
                 
-                /* 动态样式逻辑：根据 isLoading 切换质感 */
+                /* 动态样式逻辑 */
                 ${isLoading 
-                  ? 'border-blue-400/50 bg-blue-50/50 scale-[0.98] shadow-inner' // 点击时：微缩、变蓝、内阴影
-                  : 'border-slate-200/60 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-8px_rgba(59,130,246,0.12)] hover:border-blue-400/30 hover:-translate-y-[2px]' // 常态：悬浮上浮
+                  ? 'border-blue-400/50 bg-blue-50/50 scale-[0.98] shadow-inner' 
+                  : 'border-slate-200/60 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-8px_rgba(59,130,246,0.12)] hover:border-blue-400/30 hover:-translate-y-[2px]'
                 }
               `}
             >
-              {/* 装饰：Hover 时顶部出现的极光渐变条 (仅在非加载时显示，避免视觉杂乱) */}
+              {/* 装饰：Hover 极光条 */}
               {!isLoading && (
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/0 via-blue-500/40 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               )}
@@ -163,11 +164,10 @@ const Tools = () => {
                   border
                   transition-all duration-300
                   ${isLoading 
-                    ? 'bg-blue-100 border-blue-200 text-blue-600 scale-95' // 加载时：图标框也微缩
+                    ? 'bg-blue-100 border-blue-200 text-blue-600 scale-95'
                     : 'bg-gradient-to-br from-blue-50 to-indigo-50/50 border-blue-100/60 text-blue-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] group-hover:scale-105'
                   }
                 `}>
-                  {/* 图标切换动画：点击时平滑切换为 Loading */}
                   {isLoading ? (
                     <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" strokeWidth={2} />
                   ) : (
@@ -192,19 +192,16 @@ const Tools = () => {
 
                 {/* 操作区域 */}
                 <div className="shrink-0 sm:mt-auto sm:w-full sm:pt-3">
-                  {/* 手机端箭头 / Loading */}
                   <div className={`sm:hidden transition-all ${isLoading ? 'text-blue-600 translate-x-1' : 'text-slate-300 group-hover:text-blue-500'}`}>
                     {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ChevronRight className="w-5 h-5" />}
                   </div>
 
-                  {/* 桌面端按钮 */}
                   <div className={`
                     hidden sm:flex items-center gap-2 text-sm font-medium transition-colors duration-300
                     ${isLoading ? 'text-blue-700' : 'text-blue-600/90 group-hover:text-blue-700'}
                   `}>
                     <span className="relative">
                       {tool.external ? '访问链接' : '立即使用'}
-                      {/* 下划线动画 (加载时隐藏) */}
                       {!isLoading && <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-blue-600 transition-all duration-300 group-hover:w-full" />}
                     </span>
                     <ArrowRight className={`w-4 h-4 transition-transform ${isLoading ? 'translate-x-1 opacity-50' : 'group-hover:translate-x-1'}`} />
@@ -222,6 +219,7 @@ const Tools = () => {
         })}
       </div>
 
+      {/* 底部提示卡片 - 已修复 */}
       <div className="mt-8 sm:mt-12 pb-8">
         <Card className="
           relative overflow-hidden
@@ -231,7 +229,8 @@ const Tools = () => {
           backdrop-blur-sm
           p-6 sm:p-8
         ">
-          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-5 sm:gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-start gap-5 sm:gap-8">
+            {/* 图标 */}
             <div className="
               w-10 h-10 sm:w-12 sm:h-12 
               rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-white/50
@@ -240,7 +239,59 @@ const Tools = () => {
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 fill-blue-50" />
             </div>
 
-            <div className="flex-1 space-y-3 w-full">
-              <h3 className="text-base sm:text-lg font-semibold text-slate-800 tracking-tight">使用小贴士</h3>
+            {/* 内容区域 */}
+            <div className="flex-1 w-full space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 tracking-tight">
+                使用小贴士
+              </h3>
               
-              <div className="g
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="flex gap-3">
+                  <ShieldCheck className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-700">数据隐私安全</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      本站所有文本处理（如去重、提取）均在本地浏览器完成，数据不会上传至服务器。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Zap className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-700">提升处理效率</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      对于包含大量行数的文本，建议使用 Chrome 或 Edge 浏览器以获得最佳的 JS 运行性能。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Globe className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-700">外部工具网络</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      带有 <ExternalLink className="inline w-3 h-3 mx-0.5" /> 图标的工具为第三方服务，可能需要特定的网络环境才能正常访问。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Cookie className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-medium text-slate-700">Cookie 格式</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      使用 Cookie 相关工具时，请确保输入格式为标准的 Netscape 格式或 JSON 格式。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </PageLayout>
+  );
+};
+
+export default Tools;
