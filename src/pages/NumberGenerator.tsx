@@ -6,17 +6,19 @@ import {
   CheckCircle2, 
   Settings2,
   Cpu,
-  Hash,
-  ListOrdered
+  ListOrdered,
+  Check
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input"; // 假设你有这个组件，如果没有，下面使用了原生input加Tailwind样式
 import PageLayout from "@/components/PageLayout";
 
 const NumberGenerator = () => {
   // --- 配置状态 ---
+  // 仅允许的号段列表
+  const ALLOWED_PREFIXES = ["6155", "6156", "6157", "6158"];
+  
   const [config, setConfig] = useState({
-    prefix: "6158",
+    prefix: "6158", // 默认选中最后一个
     count: 100
   });
 
@@ -39,29 +41,23 @@ const NumberGenerator = () => {
     }
   };
 
-  // 处理输入变化
-  const handleConfigChange = (key: 'prefix' | 'count', value: string) => {
-    if (key === 'count') {
-      // 限制数量输入，防止过大，比如限制最大 5000
-      let num = parseInt(value);
-      if (isNaN(num)) num = 0;
-      if (num > 5000) num = 5000; 
-      setConfig(prev => ({ ...prev, count: num }));
-    } else {
-      // 限制前缀长度，比如最大13位（留1位随机）
-      if (value.length > 13) return;
-      setConfig(prev => ({ ...prev, prefix: value }));
-    }
+  // 处理前缀切换
+  const handlePrefixSelect = (prefix: string) => {
+    triggerHaptic('light');
+    setConfig(prev => ({ ...prev, prefix }));
+  };
+
+  // 处理数量变化
+  const handleCountChange = (value: string) => {
+    let num = parseInt(value);
+    if (isNaN(num)) num = 0;
+    if (num > 5000) num = 5000; // 性能保护限制
+    setConfig(prev => ({ ...prev, count: num }));
   };
 
   const handleGenerate = () => {
-    // 基础校验
-    if (!config.prefix) {
-      alert("请输入前缀");
-      return;
-    }
     if (config.count <= 0) {
-      alert("数量必须大于0");
+      alert("生成数量必须大于0");
       return;
     }
 
@@ -83,24 +79,10 @@ const NumberGenerator = () => {
     }, 50);
 
     const finishGeneration = () => {
-      // --- 核心逻辑更新 ---
       const prefix = config.prefix;
       const count = config.count;
       const totalLength = 14; 
-      // 计算需要随机生成的位数
-      const randomLength = totalLength - prefix.length;
-
-      // 如果前缀已经超过或等于总长度，直接截取或保持
-      if (randomLength <= 0) {
-        setProgress(100);
-        setTimeout(() => {
-          // 如果前缀太长，就只生成重复的前缀（作为一种容错）或者提示错误
-          // 这里简单处理：直接重复显示前缀
-          const fixedList = new Array(count).fill(prefix.substring(0, totalLength));
-          updateResult(fixedList);
-        }, 200);
-        return;
-      }
+      const randomLength = totalLength - prefix.length; // 固定为 10位随机
 
       let newNumbers = [];
       for (let i = 0; i < count; i++) {
@@ -111,14 +93,10 @@ const NumberGenerator = () => {
         newNumbers.push(prefix + randomPart);
       }
       
-      updateResult(newNumbers);
-    };
-
-    const updateResult = (list: string[]) => {
       setProgress(100);
       setTimeout(() => {
-        setResultList(list);
-        setHistoryCount(list.length);
+        setResultList(newNumbers);
+        setHistoryCount(newNumbers.length);
         setStatus('success');
         triggerHaptic('heavy');
         
@@ -148,8 +126,8 @@ const NumberGenerator = () => {
 
   return (
     <PageLayout
-      title="14位数字生成器"
-      description="批量生成指定前缀随机数"
+      title="号段生成器"
+      description="6155 - 6158 专属随机号码生成"
       backLabel="返回"
     >
       {/* Toast */}
@@ -166,9 +144,8 @@ const NumberGenerator = () => {
 
       <div className="max-w-2xl mx-auto space-y-4 p-3 pb-32 md:p-6">
         
-        {/* 1. 可配置参数卡片 */}
+        {/* 1. 配置卡片 */}
         <Card className="rounded-3xl border-0 shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-white overflow-hidden relative">
-          {/* 装饰背景 */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none opacity-60" />
 
           <div className="p-5 md:p-6 relative z-10">
@@ -177,53 +154,56 @@ const NumberGenerator = () => {
                 <Settings2 className="w-5 h-5 text-blue-600" />
                 生成配置
               </h2>
-              {/* 显示总位数提示 */}
               <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
                  <span className="text-xs font-semibold text-slate-500">总长度: 14位</span>
               </div>
             </div>
 
-            {/* 输入区域：改为两列布局 */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
               
-              {/* 前缀输入 */}
-              <div className="space-y-2">
+              {/* 号段选择器：取代原本的输入框 */}
+              <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <Hash className="w-3 h-3" /> 固定前缀
+                  选择号段 (Prefix)
                 </label>
-                <div className="relative">
-                  <input
-                    type="text" // 保持text以支持前导0
-                    inputMode="numeric" // 手机端呼出数字键盘
-                    value={config.prefix}
-                    onChange={(e) => handleConfigChange('prefix', e.target.value)}
-                    className="
-                      w-full bg-slate-50 border border-slate-200 
-                      rounded-xl py-3 px-3 
-                      text-lg font-mono font-bold text-slate-800 
-                      focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                      transition-all
-                    "
-                    placeholder="如: 6158"
-                  />
-                  {/* 输入长度提示 */}
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 bg-white/50 px-1 rounded">
-                    {config.prefix.length}位
-                  </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {ALLOWED_PREFIXES.map((p) => {
+                    const isSelected = config.prefix === p;
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => handlePrefixSelect(p)}
+                        className={`
+                          relative flex flex-col items-center justify-center py-3 rounded-xl border
+                          transition-all duration-200 active:scale-95
+                          ${isSelected 
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30' 
+                            : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-slate-100'}
+                        `}
+                      >
+                        <span className="font-mono font-bold text-lg">{p}</span>
+                        {isSelected && (
+                          <div className="absolute -top-2 -right-2 bg-white text-blue-600 rounded-full p-0.5 shadow-sm">
+                            <Check className="w-3 h-3" strokeWidth={4} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* 数量输入 */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <ListOrdered className="w-3 h-3" /> 生成数量
+                  <ListOrdered className="w-3 h-3" /> 生成数量 (Count)
                 </label>
                 <div className="relative">
                   <input
                     type="number"
                     pattern="\d*"
                     value={config.count}
-                    onChange={(e) => handleConfigChange('count', e.target.value)}
+                    onChange={(e) => handleCountChange(e.target.value)}
                     className="
                       w-full bg-slate-50 border border-slate-200 
                       rounded-xl py-3 px-3 
@@ -232,19 +212,15 @@ const NumberGenerator = () => {
                       transition-all
                     "
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
                     个
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 动态计算后的随机位数提示 */}
-            <div className="mt-3 text-xs text-slate-400 text-center bg-slate-50/50 py-1.5 rounded-lg border border-slate-100 border-dashed">
-              将在前缀后补齐 <span className="font-bold text-slate-600">{Math.max(0, 14 - config.prefix.length)}</span> 位随机数
-            </div>
-
-            <div className="mt-5">
+            {/* 底部生成按钮 */}
+            <div className="mt-8">
               <button
                 onClick={handleGenerate}
                 disabled={status === 'generating'}
@@ -267,7 +243,7 @@ const NumberGenerator = () => {
                     <>
                       <Sparkles className="w-5 h-5 text-white/90" />
                       <span className="text-base font-semibold text-white">
-                        开始生成
+                        生成 {config.prefix} 号段
                       </span>
                     </>
                   )}
@@ -277,7 +253,7 @@ const NumberGenerator = () => {
           </div>
         </Card>
 
-        {/* 2. 结果展示区域 - 保持之前的列表渲染优化 */}
+        {/* 2. 结果展示区域 */}
         <div className={`
           transition-all duration-500 ease-in-out
           ${status === 'idle' ? 'opacity-50 grayscale' : 'opacity-100 grayscale-0'}
@@ -287,7 +263,9 @@ const NumberGenerator = () => {
             <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-white z-20 shadow-sm">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${status === 'success' ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
-                <span className="text-sm font-medium text-slate-600">结果列表</span>
+                <span className="text-sm font-medium text-slate-600">
+                  {status === 'success' ? `已生成 (前缀: ${config.prefix})` : '结果列表'}
+                </span>
               </div>
               {historyCount > 0 && (
                 <div className="text-xs font-mono text-slate-400">
@@ -319,8 +297,8 @@ const NumberGenerator = () => {
                       
                       {/* 数字内容：高亮前缀部分 */}
                       <div className="pl-4 py-2 font-mono text-[15px] tracking-wider text-slate-700">
-                        <span className="font-bold text-blue-600/80">{config.prefix}</span>
-                        <span>{num.substring(config.prefix.length)}</span>
+                        <span className="font-bold text-blue-600">{config.prefix}</span>
+                        <span className="text-slate-600">{num.substring(4)}</span>
                       </div>
                     </div>
                   ))}
@@ -331,7 +309,7 @@ const NumberGenerator = () => {
                   <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-3">
                     <Cpu className="w-8 h-8 opacity-20" />
                   </div>
-                  <p className="text-sm">配置参数后点击生成</p>
+                  <p className="text-sm">选择号段后点击生成</p>
                 </div>
               )}
             </div>
