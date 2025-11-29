@@ -12,7 +12,8 @@ import {
   AtSign, 
   Sparkles, 
   Store, 
-  ArrowRight 
+  ArrowRight,
+  Binary // 新增图标
 } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 
@@ -25,6 +26,13 @@ const Tools = () => {
       icon: Hash,
       title: "14位数字提取工具",
       description: "自动从文本中提取并去重14位连续数字",
+      external: false,
+    },
+    {
+      path: "/14d",
+      icon: Binary,
+      title: "14位数字生成工具",
+      description: "批量生成6158开头的14位随机数字",
       external: false,
     },
     {
