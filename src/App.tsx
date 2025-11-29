@@ -13,6 +13,7 @@ import TextDeduplicator from "./pages/TextDeduplicator";
 import EmailDomainFormatter from "./pages/EmailDomainFormatter";
 import DiscordFormatter from "./pages/DiscordFormatter";
 import NumberExtractor from "./pages/NumberExtractor";
+import NumberGenerator from "./pages/NumberGenerator"; // 1. 引入新组件
 import SoftwareDownload from "./pages/SoftwareDownload";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,10 @@ const App = () => (
           <Route path="/yopmail" element={<EmailDomainFormatter />} />
           <Route path="/discord" element={<DiscordFormatter />} />
           <Route path="/14" element={<NumberExtractor />} />
+          
+          {/* 2. 添加新路由 /14d */}
+          <Route path="/14d" element={<NumberGenerator />} />
+          
           <Route path="/rj" element={<SoftwareDownload />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
