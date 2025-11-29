@@ -1,20 +1,20 @@
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  return {
-    plugins: [react()],
-    base: '/test-584136/', // 重要：匹配你的 GitHub 仓库名称
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './'),
-      },
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { componentTagger } from "lovable-tagger";
+
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  base: '/test-584136/',
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
-    define: {
-      // 允许在客户端代码中使用 process.env.API_KEY
-      'process.env.API_KEY': JSON.stringify(env.API_KEY)
-    }
-  };
-});
+  },
+}));
