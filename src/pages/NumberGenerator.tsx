@@ -7,7 +7,8 @@ import {
   Check, 
   Hash,
   Settings2,
-  Zap
+  CheckCircle2,
+  X
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +21,7 @@ const NumberGenerator = () => {
   const [historyCount, setHistoryCount] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // 震动反馈辅助函数
+  // 震动反馈
   const triggerHaptic = () => {
     if (navigator.vibrate) navigator.vibrate(10);
   };
@@ -29,7 +30,6 @@ const NumberGenerator = () => {
     triggerHaptic();
     setIsGenerating(true);
     
-    // 模拟极短的加载延迟，提升感知体验
     setTimeout(() => {
       const prefix = "6158";
       const count = 100;
@@ -51,10 +51,25 @@ const NumberGenerator = () => {
       setIsCopied(false);
       setIsGenerating(false);
       
-      toast.success(`成功生成 ${count} 个号码`, {
-        position: "top-center",
-        icon: <Zap className="w-4 h-4 text-amber-500" />
-      });
+      // 方案一：生成成功 - 灵动卡片
+      toast.custom((t) => (
+        <div className="flex items-center gap-4 px-5 py-4 bg-white/95 backdrop-blur-md border border-blue-50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl min-w-[300px] animate-in slide-in-from-top-2 fade-in duration-300">
+          {/* 左侧图标容器 */}
+          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-blue-600 fill-blue-600/20" />
+          </div>
+          
+          {/* 文字内容 */}
+          <div className="flex-1">
+            <h4 className="font-medium text-slate-800 text-sm">生成完成</h4>
+            <p className="text-xs text-slate-500 mt-0.5">成功生成 {count} 个号码，无重复</p>
+          </div>
+          
+          {/* 装饰条 */}
+          <div className="w-1 h-8 rounded-full bg-blue-500/80" />
+        </div>
+      ), { duration: 2500 });
+
     }, 300);
   };
 
@@ -63,15 +78,33 @@ const NumberGenerator = () => {
     triggerHaptic();
     navigator.clipboard.writeText(result);
     setIsCopied(true);
-    toast.success("已复制到剪贴板", { position: "top-center" });
     setTimeout(() => setIsCopied(false), 2000);
+
+    // 方案一：复制成功 - 深色胶囊 (对比度高，适合快速反馈)
+    toast.custom((t) => (
+      <div className="flex items-center gap-3 px-4 py-3 bg-slate-800 text-white shadow-xl shadow-slate-500/20 rounded-full mx-auto animate-in zoom-in-95 fade-in duration-200">
+        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+          <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+        </div>
+        <span className="font-medium text-sm pr-2">已复制到剪贴板</span>
+      </div>
+    ), { duration: 1500 });
   };
 
   const handleClear = () => {
     triggerHaptic();
     setResult("");
     setHistoryCount(0);
-    toast.info("内容已清空", { position: "top-center" });
+    
+    // 方案一：清空 - 简约卡片
+    toast.custom((t) => (
+      <div className="flex items-center gap-3 px-4 py-3 bg-white border border-slate-100 shadow-lg rounded-2xl animate-in slide-in-from-bottom-2 fade-in">
+        <div className="p-2 bg-red-50 rounded-xl">
+          <Trash2 className="w-4 h-4 text-red-500" />
+        </div>
+        <span className="text-sm text-slate-600 font-medium">内容已清空</span>
+      </div>
+    ), { duration: 1500 });
   };
 
   return (
@@ -113,7 +146,7 @@ const NumberGenerator = () => {
               </div>
             </div>
 
-            {/* 右侧操作按钮 - 移动端全宽 */}
+            {/* 右侧操作按钮 */}
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
@@ -138,7 +171,7 @@ const NumberGenerator = () => {
         {/* 结果显示区域 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           
-          {/* 左侧：统计与提示 - 移动端改为水平紧凑布局 */}
+          {/* 左侧：统计与提示 */}
           <Card className="
             lg:col-span-1 h-fit
             rounded-3xl border-transparent bg-slate-50
@@ -156,17 +189,16 @@ const NumberGenerator = () => {
                 </div>
               </div>
               
-              {/* 移动端仅显示的装饰图标 */}
               <div className="lg:hidden w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-500">
                 <Sparkles className="w-5 h-5" />
               </div>
             </div>
 
-            {/* 功能提示 - 移动端使用 Grid 2列 */}
+            {/* 功能提示 */}
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
               <div className="flex flex-col lg:flex-row items-center lg:items-center gap-2 lg:gap-3 text-xs md:text-sm text-slate-600 p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
                 <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
-                  <Sparkles className="w-3 h-3 lg:w-4 lg:h-4" />
+                  <CheckCircle2 className="w-3 h-3 lg:w-4 lg:h-4" />
                 </div>
                 <span className="text-center lg:text-left">随机不重复</span>
               </div>
@@ -186,7 +218,7 @@ const NumberGenerator = () => {
             shadow-[0_2px_12px_rgba(0,0,0,0.06)]
             p-1
           ">
-            {/* 浮动工具栏 - 增加背景模糊，防止文字重叠看不清 */}
+            {/* 浮动工具栏 */}
             <div className="absolute top-3 right-3 z-10 flex items-center gap-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm">
               <button
                 onClick={handleCopy}
@@ -229,7 +261,7 @@ const NumberGenerator = () => {
               className="
                 w-full h-[350px] md:h-[450px] 
                 p-5 md:p-6 
-                pt-16 md:pt-16 /* 顶部留白，防止被按钮遮挡 */
+                pt-16 md:pt-16 
                 resize-none
                 border-none focus-visible:ring-0 
                 bg-transparent text-slate-700 font-mono text-base leading-relaxed
