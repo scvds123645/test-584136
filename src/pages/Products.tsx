@@ -110,51 +110,6 @@ const products = [
       { label: "好评率", value: "98.5%", icon: Shield },
       { label: "响应", value: "<2h", icon: Clock }
     ]
-  },
-  // Duplicating specifically for grid demo purposes
-  {
-    id: 2,
-    name: "耐用老号",
-    description: "经过长期养护的高权重账号，适合广告投放与营销",
-    price: "15",
-    currency: "¥",
-    unit: "/个",
-    salesCount: "2103",
-    stock: "150+",
-    features: [
-      "人工养号超过1年，权重极高",
-      "自带部分好友与动态，更真实",
-      "支持广告投放功能",
-      "无痕环境登录交付"
-    ],
-    badge: "热销推荐",
-    trustBadges: [
-      { label: "已服务", value: "1200+", icon: Star },
-      { label: "稳定性", value: "High", icon: Shield },
-      { label: "响应", value: "<1h", icon: Clock }
-    ]
-  },
-  {
-    id: 3,
-    name: "BM商务号",
-    description: "Business Manager权限账号，专为企业广告管理设计",
-    price: "45",
-    currency: "¥",
-    unit: "/个",
-    salesCount: "856",
-    stock: "42",
-    features: [
-      "已验证BM权限，直接使用",
-      "可创建多个广告账户",
-      "支持像素绑定与数据追踪",
-      "专业技术支持对接"
-    ],
-    badge: "高阶版",
-    trustBadges: [
-      { label: "满意度", value: "100%", icon: Star },
-      { label: "安全性", value: "Pro", icon: Shield },
-      { label: "响应", value: "VIP", icon: Clock }
-    ]
   }
 ];
 
