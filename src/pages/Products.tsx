@@ -52,10 +52,32 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 // Simulating the Shadcn Dialog structure for the demo
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
+
+/* 
+   IMPORTANT: 
+   Updated DialogContentWrapper to EXACTLY match the "ContactMePage" 
+   style and animation (appearance way).
+*/
 const DialogContentWrapper = ({ children, className }) => (
   <DialogPrimitive.Portal>
     <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-    <DialogPrimitive.Content className={`fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-white p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-[28px] ${className}`}>
+    <DialogPrimitive.Content 
+      className={`
+        fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] 
+        gap-0 border-none bg-white/95 backdrop-blur-xl p-0 shadow-2xl duration-200 
+        
+        /* Standard Shadcn Animations used in Code 1 */
+        data-[state=open]:animate-in data-[state=closed]:animate-out 
+        data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
+        data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 
+        data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] 
+        data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] 
+        
+        /* Code 1 Specific Visuals */
+        rounded-[28px] max-w-[340px] sm:max-w-md overflow-hidden
+        ${className}
+      `}
+    >
       {children}
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
@@ -267,7 +289,7 @@ const ProductCard = ({ product }) => {
 /* 
   -----------------------------------------------------------------
   SUB-COMPONENT: Contact Dialog 
-  (SYNCHRONIZED WITH CODE 1 "ContactMePage" STYLE)
+  (FULLY SYNCHRONIZED WITH CODE 1 STYLE & ANIMATIONS)
   -----------------------------------------------------------------
 */
 const ContactDialog = ({ triggerText }) => {
@@ -284,10 +306,9 @@ const ContactDialog = ({ triggerText }) => {
         </Button>
       </DialogTrigger>
       
-      {/* Updated to match Code 1: max-w-[340px] sm:max-w-md, rounded-[28px] */}
-      <DialogContentWrapper className="bg-white/95 backdrop-blur-xl rounded-[28px] p-0 gap-0 border-none shadow-2xl max-w-[340px] sm:max-w-md overflow-hidden">
+      <DialogContentWrapper>
         
-        {/* Header - Synchronized with Code 1 */}
+        {/* Header - EXACT MATCH to Code 1 */}
         <div className="bg-blue-50/50 p-6 pb-4 text-center space-y-3">
           <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
             <Sparkles className="w-6 h-6 text-blue-600" />
@@ -302,7 +323,7 @@ const ContactDialog = ({ triggerText }) => {
           </div>
         </div>
 
-        {/* List Content - Synchronized with Code 1 */}
+        {/* List Content - EXACT MATCH to Code 1 */}
         <div className="p-4 space-y-2 bg-white">
           {contactLinks.map((item, index) => (
             <a
