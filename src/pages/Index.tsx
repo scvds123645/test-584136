@@ -1,347 +1,170 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
-  ShoppingCart, 
-  Star, 
-  Shield, 
-  Clock, 
-  ArrowRight, 
+  Mail, 
   Sparkles, 
-  Send, 
-  Check, 
-  ChevronLeft 
+  ArrowRight, 
+  Package, 
+  Wrench, 
+  Send 
 } from 'lucide-react';
 
 /* 
-  -----------------------------------------------------------------
-  MOCKED SHADCN UI COMPONENTS
-  (Inline implementation for demo purposes)
-  -----------------------------------------------------------------
+  ASSUMPTION: 
+  These components are imported from your local shadcn/ui configuration.
+  If you are using a different path, please adjust the imports accordingly.
 */
-const Button = ({ className, variant = "default", size = "default", children, ...props }) => {
-  const baseStyles = "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
-  const variants = {
-    default: "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200",
-    outline: "border border-slate-200 bg-transparent hover:bg-slate-50 text-slate-600",
-    ghost: "hover:bg-slate-100 text-slate-700",
-  };
-  const sizes = {
-    default: "h-12 px-6 py-2",
-    icon: "h-10 w-10",
-  };
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const ContactMePage = () => {
+  const navigate = useNavigate();
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  // Set document title on mount
+  useEffect(() => {
+    document.title = "联系我";
+  }, []);
+
+  // Contact list data for the modal
+  const contactOptions = [1, 2, 3];
+
   return (
-    <button className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
-      {children}
-    </button>
-  );
-};
-
-const Badge = ({ className, variant = "default", children }) => {
-  const variants = {
-    default: "border-transparent bg-blue-100 text-blue-700 hover:bg-blue-200",
-    outline: "text-slate-500 border-slate-200",
-  };
-  return (
-    <div className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variants[variant]} ${className}`}>
-      {children}
-    </div>
-  );
-};
-
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-
-// Simulating the Shadcn Dialog structure for the demo
-const Dialog = DialogPrimitive.Root;
-const DialogTrigger = DialogPrimitive.Trigger;
-
-// UPDATED: DialogContentWrapper styled exactly like Code 1
-const DialogContentWrapper = ({ children, className }) => (
-  <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-    <DialogPrimitive.Content 
-      className={`
-        fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] 
-        gap-0 border-none bg-white/95 backdrop-blur-xl p-0 shadow-2xl duration-200 
-        data-[state=open]:animate-in data-[state=closed]:animate-out 
-        data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
-        data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 
-        data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] 
-        data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] 
-        rounded-[28px] max-w-[340px] sm:max-w-md overflow-hidden
-        ${className}
-      `}
-    >
-      {children}
-    </DialogPrimitive.Content>
-  </DialogPrimitive.Portal>
-);
-
-/* 
-  -----------------------------------------------------------------
-  CUSTOM PAGE LAYOUT COMPONENT
-  -----------------------------------------------------------------
-*/
-const PageLayout = ({ children, backLabel = "返回首页" }) => {
-  return (
-    <div className="min-h-screen w-full bg-[#f8f9fa] font-sans selection:bg-blue-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Header */}
-        <header className="mb-8">
-          <Button variant="ghost" className="rounded-full pl-2 pr-4 hover:bg-white/50 text-slate-500">
-            <ChevronLeft className="mr-1 h-5 w-5" />
-            {backLabel}
-          </Button>
-        </header>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-/* 
-  -----------------------------------------------------------------
-  DATA STRUCTURE
-  -----------------------------------------------------------------
-*/
-const products = [
-  {
-    id: 1,
-    name: "脸书白号",
-    description: "企业级账号解决方案，3天质保服务，安全稳定可靠",
-    price: "2",
-    currency: "¥",
-    unit: "/个",
-    salesCount: "5418",
-    stock: "999+",
-    features: [
-      "真实IP注册，账号安全有保障",
-      "账号注册时长30-180天，活跃度高",
-      "Cookie登录方式，即开即用",
-      "购买后立即交付，无需等待"
-    ],
-    badge: "企业优选",
-    trustBadges: [
-      { label: "已服务", value: "5000+", icon: Star },
-      { label: "好评率", value: "98.5%", icon: Shield },
-      { label: "响应", value: "<2h", icon: Clock }
-    ]
-  }
-];
-
-const contactLinks = [1, 2, 3];
-
-/* 
-  -----------------------------------------------------------------
-  MAIN COMPONENT: ProductsPage
-  -----------------------------------------------------------------
-*/
-const ProductsPage = () => {
-  return (
-    <PageLayout backLabel="返回首页">
+    <div className="min-h-screen w-full bg-[#f8f9fa] flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
       
-      {/* 1. Header Section */}
-      <section className="flex flex-col items-center text-center space-y-6 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* 
+        --- Background Decorative Blobs (Optional for extra Material vibe) ---
+        Added subtle background gradients to enhance the 'surface' feel 
+      */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-slate-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+
+      {/* Main Content Container */}
+      <main className="w-full max-w-md flex flex-col items-center text-center space-y-8 z-10 animate-in fade-in zoom-in duration-500">
         
-        {/* Promotion Chip */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-100">
-          <Sparkles className="w-4 h-4 text-blue-600 fill-blue-200" />
-          <span className="text-sm font-semibold text-blue-900">
-            限时优惠 · 批量购买享更多折扣
+        {/* 1. Badge: Tonal Style */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <span className="text-xs font-medium text-blue-700 tracking-wide">
+            专业服务 · 品质保障
           </span>
         </div>
 
-        {/* Titles */}
-        <div className="space-y-3 max-w-2xl">
+        {/* 2. Hero Icon Container */}
+        <div className="relative group cursor-default">
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-blue-500 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
+          
+          {/* Icon Box */}
+          <div className="relative w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[2rem] flex items-center justify-center shadow-xl shadow-blue-200 transform transition-transform duration-300 hover:scale-105">
+            <Mail className="w-10 h-10 text-white" strokeWidth={1.5} />
+          </div>
+        </div>
+
+        {/* 3. Typography */}
+        <div className="space-y-3">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
-            专业服务商
+            联系我
           </h1>
-          <p className="text-lg text-slate-600 leading-relaxed">
-            提供高质量Facebook白号，严格质量把控，完善售后保障体系，
-            助您业务快速起飞。
+          <p className="text-slate-500 text-base leading-relaxed max-w-[280px] mx-auto">
+            很高兴认识您！如有任何问题，欢迎随时与我联系。
           </p>
         </div>
-      </section>
 
-      {/* 2. Product Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </section>
+        {/* 4. Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full px-4 sm:px-0 pt-4">
+          {/* Dialog Trigger (Primary) */}
+          <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                className="flex-1 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 text-lg font-medium transition-all hover:shadow-xl hover:-translate-y-0.5"
+              >
+                <Send className="w-5 h-5 mr-2" />
+                立即联系
+                <ArrowRight className="w-5 h-5 ml-1 opacity-80" />
+              </Button>
+            </DialogTrigger>
 
-      {/* 5. Bottom Info Card (Security) */}
-      <section className="w-full max-w-4xl mx-auto">
-        <div className="group relative overflow-hidden bg-white rounded-[2rem] p-8 shadow-sm hover:shadow-lg transition-all duration-500 border border-slate-100">
-          {/* Decorative background blob */}
-          <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8 text-center md:text-left">
-            <div className="flex-shrink-0 w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
-              <Shield className="w-8 h-8 text-blue-600" />
-            </div>
-            
-            <div className="flex-1 space-y-2">
-              <h3 className="text-xl font-bold text-slate-900">全方位安全保障</h3>
-              <p className="text-slate-500 leading-relaxed">
-                所有账号均经过严格质量检测，确保环境纯净。我们提供7x24小时技术支持，
-                遇到任何非人为账号封禁问题，承诺质保期内免费更换。
-              </p>
-            </div>
-
-            <Button variant="outline" className="rounded-full h-12 px-8 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600">
-              了解更多
-            </Button>
-          </div>
-        </div>
-      </section>
-
-    </PageLayout>
-  );
-};
-
-/* 
-  -----------------------------------------------------------------
-  SUB-COMPONENT: Product Card
-  -----------------------------------------------------------------
-*/
-const ProductCard = ({ product }) => {
-  return (
-    <div className="group flex flex-col bg-white rounded-[2rem] p-2 border-0 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out">
-      {/* Card Content Wrapper */}
-      <div className="flex-1 flex flex-col p-5 space-y-6">
-        
-        {/* Header: Title + Badge */}
-        <div className="flex justify-between items-start gap-4">
-          <div className="space-y-1">
-            <h3 className="text-2xl font-bold text-slate-900">{product.name}</h3>
-            <p className="text-sm text-slate-500 leading-snug line-clamp-2">
-              {product.description}
-            </p>
-          </div>
-          <Badge className="rounded-full bg-blue-100 text-blue-700 hover:bg-blue-100 px-3 py-1 flex-shrink-0">
-            {product.badge}
-          </Badge>
-        </div>
-
-        {/* Pricing Section */}
-        <div className="flex items-end justify-between border-b border-slate-50 pb-6">
-          <div className="flex items-baseline">
-            <span className="text-2xl font-bold text-blue-600 mr-0.5">{product.currency}</span>
-            <span className="text-5xl font-bold text-blue-600 tracking-tighter">{product.price}</span>
-            <span className="text-slate-400 font-medium ml-1">{product.unit}</span>
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <span className="bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-full">
-              库存: {product.stock}
-            </span>
-            <span className="text-xs text-slate-400">
-              已售: {product.salesCount}
-            </span>
-          </div>
-        </div>
-
-        {/* Feature List */}
-        <ul className="space-y-3 flex-1">
-          {product.features.map((feature, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-green-50 flex items-center justify-center">
-                <Check className="w-3 h-3 text-green-600" strokeWidth={3} />
-              </div>
-              <span className="text-sm text-slate-600 font-medium">
-                {feature}
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Trust Badges Grid */}
-        <div className="bg-slate-50 rounded-2xl p-4 grid grid-cols-3 gap-2">
-          {product.trustBadges.map((badge, idx) => {
-            const IconComponent = badge.icon;
-            return (
-              <div key={idx} className="flex flex-col items-center text-center space-y-1">
-                <div className="w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center mb-1">
-                  <IconComponent className="w-4 h-4 text-blue-600" />
+            {/* Dialog Content (Modal) */}
+            <DialogContent className="bg-white/95 backdrop-blur-xl rounded-[28px] p-0 gap-0 border-none shadow-2xl max-w-[340px] sm:max-w-md overflow-hidden">
+              
+              {/* Dialog Header Area */}
+              <div className="bg-blue-50/50 p-6 pb-4 text-center space-y-3">
+                <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                  <Sparkles className="w-6 h-6 text-blue-600" />
                 </div>
-                <span className="text-sm font-bold text-slate-900 leading-none">{badge.value}</span>
-                <span className="text-[10px] uppercase tracking-wider text-slate-500">{badge.label}</span>
+                <DialogHeader className="space-y-1">
+                  <DialogTitle className="text-2xl font-bold text-slate-800 text-center">
+                    专业服务团队
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-500 text-center text-sm leading-relaxed">
+                    我们的客服团队将为您提供<br/>一对一专业咨询服务
+                  </DialogDescription>
+                </DialogHeader>
               </div>
-            );
-          })}
+
+              {/* Contact List */}
+              <div className="p-4 space-y-2 bg-white">
+                {contactOptions.map((item, index) => (
+                  <a
+                    key={index}
+                    href="https://t.me/Facebookkf_bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-2xl hover:bg-blue-50 group transition-colors duration-200 cursor-pointer border border-transparent hover:border-blue-100"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                        <Send className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="font-semibold text-slate-800">Telegram</span>
+                        <span className="text-xs text-slate-500">@Facebookkf_bot</span>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
+                  </a>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Navigation Button (Secondary) */}
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/products')}
+            className="flex-1 h-14 rounded-full border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 text-lg font-medium transition-all"
+          >
+            <Package className="w-5 h-5 mr-2" />
+            查看商品
+          </Button>
         </div>
+      </main>
+
+      {/* 5. Footer / Floating Action */}
+      <div className="mt-12 sm:absolute sm:bottom-8 sm:right-8">
+        <button
+          onClick={() => navigate('/tools')}
+          className="group flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-white/50 rounded-full shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-50 flex items-center justify-center transition-colors">
+             <Wrench className="w-4 h-4 text-slate-500 group-hover:text-blue-600" />
+          </div>
+          <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 pr-1">
+            工具箱
+          </span>
+        </button>
       </div>
 
-      {/* Footer Action */}
-      <div className="p-2 mt-auto">
-        <ContactDialog triggerText="咨询购买" />
-      </div>
     </div>
   );
 };
 
-/* 
-  -----------------------------------------------------------------
-  SUB-COMPONENT: Contact Dialog 
-  (FULLY SYNCHRONIZED WITH CODE 1 STYLE & ANIMATION)
-  -----------------------------------------------------------------
-*/
-const ContactDialog = ({ triggerText }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          className="w-full rounded-[1.5rem] h-14 text-lg bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100 transition-all active:scale-95"
-        >
-          <ShoppingCart className="w-5 h-5 mr-2" />
-          {triggerText}
-        </Button>
-      </DialogTrigger>
-      
-      {/* Wrapper already handles the specific 'Code 1' classes */}
-      <DialogContentWrapper>
-        
-        {/* Header - EXACT MATCH to Code 1 */}
-        <div className="bg-blue-50/50 p-6 pb-4 text-center space-y-3">
-          <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
-            <Sparkles className="w-6 h-6 text-blue-600" />
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-slate-800 text-center">
-              专业服务团队
-            </h2>
-            <p className="text-slate-500 text-center text-sm leading-relaxed">
-              我们的客服团队将为您提供<br/>一对一专业咨询服务
-            </p>
-          </div>
-        </div>
-
-        {/* List Content - EXACT MATCH to Code 1 */}
-        <div className="p-4 space-y-2 bg-white">
-          {contactLinks.map((item, index) => (
-            <a
-              key={index}
-              href="https://t.me/Facebookkf_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 rounded-2xl hover:bg-blue-50 group transition-colors duration-200 cursor-pointer border border-transparent hover:border-blue-100"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                  <Send className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors" />
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="font-semibold text-slate-800">Telegram</span>
-                  <span className="text-xs text-slate-500">@Facebookkf_bot</span>
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
-            </a>
-          ))}
-        </div>
-      </DialogContentWrapper>
-    </Dialog>
-  );
-};
-
-export default ProductsPage;
+export default ContactMePage;
