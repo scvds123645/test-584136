@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import PageLayout from "@/components/PageLayout";
+import SEO from '@/components/SEO';
 
 const NumberGenerator = () => {
   // --- 配置状态 ---
@@ -110,11 +111,17 @@ const NumberGenerator = () => {
   };
 
   return (
-    <PageLayout
-      title="FB UID 生成器"
-      description="批量生成 99 个 Facebook 账户 ID"
-      backLabel="返回"
-    >
+    <>
+      <SEO
+        title="FB UID生成器"
+        description="Facebook账户ID批量生成工具，一键生成99个随机14位UID，支持多种号段前缀选择，账号测试和开发必备"
+        keywords="UID生成器,Facebook UID,账户ID生成,批量生成,随机UID,14位数字"
+      />
+      <PageLayout
+        title="FB UID 生成器"
+        description="批量生成 99 个 Facebook 账户 ID"
+        backLabel="返回"
+      >
       {/* Toast 提示 */}
       <div className={`
         fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none
@@ -322,6 +329,7 @@ const NumberGenerator = () => {
         </div>
       </div>
     </PageLayout>
+    </>
   );
 };
 

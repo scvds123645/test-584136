@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+// 1. 引入路由钩子，用于页面跳转
+import { useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
   Star, 
@@ -10,6 +12,7 @@ import {
   Check, 
   ChevronLeft 
 } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 /* 
   -----------------------------------------------------------------
@@ -58,7 +61,7 @@ const DialogTrigger = DialogPrimitive.Trigger;
    Updated DialogContentWrapper to be fully responsive.
    Changed width to w-[90vw] for mobile safety margins.
 */
-const DialogContentWrapper = ({ children, className }) => (
+const DialogContentWrapper = ({ children, className = "" }) => (
   <DialogPrimitive.Portal>
     <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
     <DialogPrimitive.Content 
@@ -88,14 +91,21 @@ const DialogContentWrapper = ({ children, className }) => (
   CUSTOM PAGE LAYOUT COMPONENT
   -----------------------------------------------------------------
 */
-const PageLayout = ({ children, backLabel = "返回首页" }) => {
+const PageLayout = ({ children, backLabel = "返回首页", className = "" }) => {
+  // 2. 使用 navigate 实现返回功能
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen w-full bg-[#f8f9fa] font-sans selection:bg-blue-100">
+    <div className={`min-h-screen w-full bg-[#f8f9fa] font-sans selection:bg-blue-100 ${className}`}>
       {/* Adjusted padding for mobile: px-4 py-6 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Navigation Header */}
         <header className="mb-6 sm:mb-8">
-          <Button variant="ghost" className="rounded-full pl-2 pr-4 hover:bg-white/50 text-slate-500 h-10 sm:h-12">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')} // 添加点击跳转事件
+            className="rounded-full pl-2 pr-4 hover:bg-white/50 text-slate-500 h-10 sm:h-12"
+          >
             <ChevronLeft className="mr-1 h-5 w-5" />
             {backLabel}
           </Button>
@@ -144,10 +154,46 @@ const contactLinks = [1, 2, 3];
   -----------------------------------------------------------------
 */
 const ProductsPage = () => {
+  
+  // 3. SEO: 设置页面标题
+  useEffect(() => {
+    document.title = "购买账号 - 脸书(Facebook)白号/耐用号商城";
+  }, []);
+
   return (
-    <PageLayout backLabel="返回首页">
-      
-      {/* 1. Header Section */}
+    <>
+      <SEO
+        title="购买账号"
+        description="专业Facebook白号/耐用号商城，提供高质量脸书账号，真实IP注册，30-180天账号，Cookie登录，3天质保，即开即用，98.5%好评率"
+        keywords="Facebook白号,脸书账号购买,耐用号,Cookie登录,账号商城,企业账号"
+        ogType="product.group"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Facebook白号",
+          "description": "企业级账号解决方案，3天质保服务，安全稳定可靠",
+          "offers": {
+            "@type": "Offer",
+            "price": "2.00",
+            "priceCurrency": "CNY",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Facebook账号服务平台"
+            }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "5418",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        }}
+      />
+      <PageLayout backLabel="返回首页">
+        
+        {/* 1. Header Section */}
       {/* Reduced bottom margin on mobile: mb-10 */}
       <section className="flex flex-col items-center text-center space-y-5 sm:space-y-6 mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
         
@@ -169,6 +215,7 @@ const ProductsPage = () => {
             助您业务快速起飞。
           </p>
         </div>
+
       </section>
 
       {/* 2. Product Grid */}
@@ -198,14 +245,19 @@ const ProductsPage = () => {
               </p>
             </div>
 
-            <Button variant="outline" className="rounded-full h-10 sm:h-12 px-6 sm:px-8 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 w-full sm:w-auto">
+            {/* UPDATED BUTTON: Added onClick handler to open Telegram link */}
+            <Button 
+              variant="outline" 
+              className="rounded-full h-10 sm:h-12 px-6 sm:px-8 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 w-full sm:w-auto"
+              onClick={() => window.open('https://t.me/Facebookkf_bot', '_blank')}
+            >
               了解更多
             </Button>
           </div>
         </div>
       </section>
-
     </PageLayout>
+    </>
   );
 };
 

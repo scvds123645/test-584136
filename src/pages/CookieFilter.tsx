@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Copy, Eraser, CheckCircle2, Settings2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageLayout from "@/components/PageLayout";
+import SEO from '@/components/SEO';
 
 const CookieFilter = () => {
   const [inputText, setInputText] = useState("");
@@ -67,7 +68,6 @@ const CookieFilter = () => {
       toast({ title: "没有内容可复制", variant: "destructive" });
       return;
     }
-
     try {
       await navigator.clipboard.writeText(outputText);
       setCopied(true);
@@ -85,20 +85,28 @@ const CookieFilter = () => {
   };
 
   return (
-    <PageLayout
-      title="Cookie 筛选工具"
-      description="输入cookie字符串，选择要筛选的字段"
-      backTo="/tools"
-      backLabel="返回工具列表"
-    >
-      <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+    <>
+      <SEO
+        title="Cookie筛选工具"
+        description="Facebook Cookie筛选工具，快速提取c_user和xs字段，批量处理Cookie数据，提升账号管理效率"
+        keywords="Cookie筛选,c_user提取,xs字段,Facebook Cookie,数据筛选工具"
+      />
+      <PageLayout
+        title="Cookie 筛选工具"
+        description="输入cookie字符串，选择要筛选的字段"
+        backTo="/tools"
+        backLabel="返回工具列表"
+      >
+      {/* 优化：手机端间距缩小 gap-4 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-6xl mx-auto">
         
         {/* Input Section */}
-        <div className="space-y-6">
-          <Card className="p-6 rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="space-y-4 md:space-y-6">
+          {/* 优化：Card padding p-4 适应手机 */}
+          <Card className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <FileText className="w-5 h-5 text-blue-600" />
-                <Label htmlFor="input" className="text-lg font-medium text-slate-800">
+                <Label htmlFor="input" className="text-base md:text-lg font-medium text-slate-800">
                 输入 Cookie
                 </Label>
             </div>
@@ -109,15 +117,16 @@ const CookieFilter = () => {
                 placeholder="粘贴cookie字符串，支持多行输入..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="min-h-[350px] w-full rounded-2xl bg-slate-50 border-transparent p-4 font-mono text-sm text-slate-700 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none shadow-inner"
+                // 优化：min-h-[200px] 适应手机屏幕
+                className="min-h-[200px] md:min-h-[350px] w-full rounded-xl md:rounded-2xl bg-slate-50 border-transparent p-4 font-mono text-sm text-slate-700 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none shadow-inner"
                 />
             </div>
           </Card>
 
-          <Card className="p-6 rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
-            <div className="flex items-center gap-2 mb-4">
+          <Card className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <Settings2 className="w-5 h-5 text-blue-600" />
-                <Label className="text-lg font-medium text-slate-800">筛选字段</Label>
+                <Label className="text-base md:text-lg font-medium text-slate-800">筛选字段</Label>
             </div>
             
             <div className="flex flex-col gap-2">
@@ -127,7 +136,8 @@ const CookieFilter = () => {
               ].map((field) => (
                 <div
                   key={field.id}
-                  className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
+                  // 优化：选项行 padding 缩小
+                  className="flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
                   onClick={() =>
                       setSelectedFields((prev) => ({
                         ...prev,
@@ -135,7 +145,7 @@ const CookieFilter = () => {
                       }))
                     }
                 >
-                  <Label htmlFor={field.id} className="text-base text-slate-700 font-mono cursor-pointer">
+                  <Label htmlFor={field.id} className="text-sm md:text-base text-slate-700 font-mono cursor-pointer">
                     {field.label}
                   </Label>
                   <Checkbox
@@ -151,60 +161,60 @@ const CookieFilter = () => {
         </div>
 
         {/* Output Section */}
-        <div className="space-y-6">
-          <Card className="p-6 rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <Label className="text-lg font-medium text-slate-800">筛选结果</Label>
-              <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold">
+        <div className="space-y-4 md:space-y-6">
+          <Card className="p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white shadow-md border-transparent hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Label className="text-base md:text-lg font-medium text-slate-800">筛选结果</Label>
+              <span className="px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-blue-50 text-blue-700 text-xs md:text-sm font-semibold">
                 {resultCount} 条结果
               </span>
             </div>
             
-            {/* Modified container: bg-slate-50 instead of bg-slate-900, transparent border */}
-            <div className="flex-grow relative rounded-2xl bg-slate-50 overflow-hidden border border-transparent shadow-inner">
-                <ScrollArea className="h-[450px] w-full">
-                <div className="p-6">
+            <div className="flex-grow relative rounded-xl md:rounded-2xl bg-slate-50 overflow-hidden border border-transparent shadow-inner">
+                {/* 优化：ScrollArea 高度响应式 */}
+                <ScrollArea className="h-[240px] md:h-[450px] w-full">
+                <div className="p-4 md:p-6">
                     {outputText ? (
-                    /* Modified text color: text-slate-700 instead of text-slate-300 */
                     <pre className="font-mono text-sm whitespace-pre-wrap break-all text-slate-700 leading-relaxed">
                         {outputText}
                     </pre>
                     ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-500 mt-20">
-                        {/* Modified icon background: bg-slate-200 instead of bg-slate-800/50 */}
+                    // 优化：Empty state 垂直居中调整
+                    <div className="h-full flex flex-col items-center justify-center text-slate-500 py-16 md:py-0 md:mt-20">
                         <div className="p-4 rounded-full bg-slate-200 mb-3">
-                            <FileText className="w-8 h-8 opacity-50" />
+                            <FileText className="w-6 h-6 md:w-8 md:h-8 opacity-50" />
                         </div>
-                        <p>结果将显示在这里...</p>
+                        <p className="text-sm">结果将显示在这里...</p>
                     </div>
                     )}
                 </div>
                 </ScrollArea>
             </div>
-
-            <div className="flex gap-4 mt-6">
+            
+            {/* 优化：按钮高度和文字大小适配 */}
+            <div className="flex gap-3 md:gap-4 mt-4 md:mt-6">
                 <Button
                     onClick={handleCopy}
                     disabled={!outputText}
-                    className={`flex-1 py-6 rounded-full text-base font-medium shadow-sm transition-all duration-300 ${
+                    className={`flex-1 h-12 md:h-14 rounded-full text-sm md:text-base font-medium shadow-sm transition-all duration-300 ${
                         copied 
                         ? "bg-green-600 hover:bg-green-700 text-white" 
                         : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-blue-200"
                     }`}
                 >
                     {copied ? (
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
+                        <CheckCircle2 className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                     ) : (
-                        <Copy className="mr-2 h-5 w-5" />
+                        <Copy className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                     )}
                     {copied ? "已复制" : "复制结果"}
                 </Button>
                 <Button
                     onClick={handleClear}
                     variant="outline"
-                    className="flex-1 py-6 rounded-full border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300"
+                    className="flex-1 h-12 md:h-14 rounded-full border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 text-sm md:text-base"
                 >
-                    <Eraser className="mr-2 h-5 w-5" />
+                    <Eraser className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                     清空
                 </Button>
             </div>
@@ -212,6 +222,7 @@ const CookieFilter = () => {
         </div>
       </div>
     </PageLayout>
+    </>
   );
 };
 

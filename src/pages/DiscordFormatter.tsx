@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Copy, Wand2, CheckCircle2, Sparkles, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageLayout from "@/components/PageLayout";
+import SEO from '@/components/SEO';
 
 interface FormattedResult {
   email: string;
@@ -81,12 +82,18 @@ const DiscordFormatter = () => {
   };
 
   return (
-    <PageLayout
-      title="账号信息格式化工具"
-      description="输入账号信息，自动格式化为标准格式"
-      backTo="/tools"
-      backLabel="返回工具列表"
-    >
+    <>
+      <SEO
+        title="账号格式化工具"
+        description="Discord、Telegram等账号信息标准格式化工具，支持邮箱密钥自动拼接，批量处理账号数据，提升效率"
+        keywords="账号格式化,Discord格式化,邮箱密钥,批量处理,账号管理工具"
+      />
+      <PageLayout
+        title="账号信息格式化工具"
+        description="输入账号信息，自动格式化为标准格式"
+        backTo="/tools"
+        backLabel="返回工具列表"
+      >
       <div className="space-y-8 max-w-4xl mx-auto">
         {/* Input Section - Material Elevated Card */}
         <Card className="p-6 md:p-8 bg-white rounded-[2rem] border-none shadow-sm hover:shadow-md transition-all duration-300">
@@ -204,6 +211,7 @@ const DiscordFormatter = () => {
         </Card>
       </div>
     </PageLayout>
+    </>
   );
 };
 

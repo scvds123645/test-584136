@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft, AlertCircle } from "lucide-react";
 import ParticleBackground from "@/components/ParticleBackground";
+import SEO from '@/components/SEO';
 
 const NotFound = () => {
   const location = useLocation();
@@ -13,7 +14,13 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center">
+    <>
+      <SEO
+        title="404 - 页面未找到"
+        description="抱歉，您访问的页面不存在或已被移除。返回首页或使用我们的Facebook账号服务和工具"
+        keywords="404,页面未找到"
+      />
+      <main className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center">
       <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 animate-fade-in max-w-2xl mx-auto">
         {/* Error icon */}
         <div className="inline-flex mb-6 sm:mb-8">
@@ -57,6 +64,7 @@ const NotFound = () => {
         </div>
       </div>
     </main>
+    </>
   );
 };
 
