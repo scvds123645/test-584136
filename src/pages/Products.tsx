@@ -14,8 +14,7 @@ import {
 /* 
   -----------------------------------------------------------------
   MOCKED SHADCN UI COMPONENTS
-  Assume these are imported from your @/components/ui directory.
-  Implemented here as inline components for a copy-pasteable demo.
+  (Inline implementation for demo purposes)
   -----------------------------------------------------------------
 */
 const Button = ({ className, variant = "default", size = "default", children, ...props }) => {
@@ -49,6 +48,7 @@ const Badge = ({ className, variant = "default", children }) => {
 };
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+
 // Simulating the Shadcn Dialog structure for the demo
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -113,7 +113,7 @@ const products = [
   }
 ];
 
-const contactLinks = [1, 2, 3]; // Placeholder for loop
+const contactLinks = [1, 2, 3];
 
 /* 
   -----------------------------------------------------------------
@@ -266,7 +266,8 @@ const ProductCard = ({ product }) => {
 
 /* 
   -----------------------------------------------------------------
-  SUB-COMPONENT: Contact Dialog (Reused Logic)
+  SUB-COMPONENT: Contact Dialog 
+  (SYNCHRONIZED WITH CODE 1 "ContactMePage" STYLE)
   -----------------------------------------------------------------
 */
 const ContactDialog = ({ triggerText }) => {
@@ -283,42 +284,44 @@ const ContactDialog = ({ triggerText }) => {
         </Button>
       </DialogTrigger>
       
-      <DialogContentWrapper className="bg-white/95 backdrop-blur-xl border-none p-0 gap-0 max-w-[360px] overflow-hidden shadow-2xl">
-        {/* Dialog Header */}
-        <div className="bg-blue-50/50 p-8 pb-6 text-center space-y-4">
-          <div className="mx-auto w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm ring-4 ring-white/50">
-            <Sparkles className="w-7 h-7 text-blue-600" />
+      {/* Updated to match Code 1: max-w-[340px] sm:max-w-md, rounded-[28px] */}
+      <DialogContentWrapper className="bg-white/95 backdrop-blur-xl rounded-[28px] p-0 gap-0 border-none shadow-2xl max-w-[340px] sm:max-w-md overflow-hidden">
+        
+        {/* Header - Synchronized with Code 1 */}
+        <div className="bg-blue-50/50 p-6 pb-4 text-center space-y-3">
+          <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+            <Sparkles className="w-6 h-6 text-blue-600" />
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">专业服务团队</h2>
-            <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold text-slate-800 text-center">
+              专业服务团队
+            </h2>
+            <p className="text-slate-500 text-center text-sm leading-relaxed">
               我们的客服团队将为您提供<br/>一对一专业咨询服务
             </p>
           </div>
         </div>
 
-        {/* Content List */}
-        <div className="p-5 space-y-3 bg-white">
+        {/* List Content - Synchronized with Code 1 */}
+        <div className="p-4 space-y-2 bg-white">
           {contactLinks.map((item, index) => (
             <a
               key={index}
               href="https://t.me/Facebookkf_bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between p-4 rounded-[20px] bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-100 transition-all duration-200 cursor-pointer"
+              className="flex items-center justify-between p-4 rounded-2xl hover:bg-blue-50 group transition-colors duration-200 cursor-pointer border border-transparent hover:border-blue-100"
             >
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-full bg-slate-50 group-hover:bg-blue-100 group-hover:text-blue-600 text-slate-400 flex items-center justify-center transition-colors">
-                  <Send className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                  <Send className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors" />
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="font-bold text-slate-800 group-hover:text-blue-900">Telegram</span>
-                  <span className="text-xs text-slate-400 font-medium">@Facebookkf_bot</span>
+                  <span className="font-semibold text-slate-800">Telegram</span>
+                  <span className="text-xs text-slate-500">@Facebookkf_bot</span>
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-white/50 transition-colors">
-                <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transform group-hover:translate-x-0.5 transition-all" />
-              </div>
+              <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
             </a>
           ))}
         </div>
