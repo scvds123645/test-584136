@@ -1,136 +1,170 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Mail, 
+  Sparkles, 
+  ArrowRight, 
+  Package, 
+  Wrench, 
+  Send 
+} from 'lucide-react';
+
+/* 
+  ASSUMPTION: 
+  These components are imported from your local shadcn/ui configuration.
+  If you are using a different path, please adjust the imports accordingly.
+*/
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Mail, Sparkles, ArrowRight, Package, Wrench, Send } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-// Google Material Design 3 (Material You) Refactor for "Contact Me" Page
-
-const Index = () => {
-  const [isContactOpen, setIsContactOpen] = useState(false);
+const ContactMePage = () => {
   const navigate = useNavigate();
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
+  // Set document title on mount
   useEffect(() => {
     document.title = "联系我";
   }, []);
 
+  // Contact list data for the modal
+  const contactOptions = [1, 2, 3];
+
   return (
-    // Material 3 Background: Very light surface color (often #f8f9fa or slate-50)
-    <main className="min-h-screen bg-[#f8f9fa] text-slate-900 font-sans selection:bg-blue-200">
-      <div className="container mx-auto px-4 py-12 min-h-screen flex flex-col items-center justify-center">
+    <div className="min-h-screen w-full bg-[#f8f9fa] flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+      
+      {/* 
+        --- Background Decorative Blobs (Optional for extra Material vibe) ---
+        Added subtle background gradients to enhance the 'surface' feel 
+      */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-slate-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+
+      {/* Main Content Container */}
+      <main className="w-full max-w-md flex flex-col items-center text-center space-y-8 z-10 animate-in fade-in zoom-in duration-500">
         
-        {/* Content Container - centered with generous spacing */}
-        <div className="max-w-md w-full mx-auto text-center space-y-8">
+        {/* 1. Badge: Tonal Style */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <span className="text-xs font-medium text-blue-700 tracking-wide">
+            专业服务 · 品质保障
+          </span>
+        </div>
 
-          {/* Badge: Material 3 "Assist Chip" or "Tonal" style */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in zoom-in duration-500">
-            <Sparkles className="w-4 h-4 fill-blue-200" />
-            <span className="text-sm font-medium tracking-wide">专业服务 · 品质保障</span>
+        {/* 2. Hero Icon Container */}
+        <div className="relative group cursor-default">
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-blue-500 rounded-[2rem] blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
+          
+          {/* Icon Box */}
+          <div className="relative w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[2rem] flex items-center justify-center shadow-xl shadow-blue-200 transform transition-transform duration-300 hover:scale-105">
+            <Mail className="w-10 h-10 text-white" strokeWidth={1.5} />
           </div>
+        </div>
 
-          {/* Hero Icon: Material 3 uses reduced tonal palettes, but we keep the brand Blue */}
-          <div className="relative inline-flex group">
-            <div className="absolute inset-0 bg-blue-200 rounded-full blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
-            <div className="relative w-24 h-24 rounded-[2rem] bg-blue-600 flex items-center justify-center shadow-xl shadow-blue-200 transition-transform duration-300 group-hover:scale-105">
-              <Mail className="w-10 h-10 text-white" strokeWidth={2} />
-            </div>
-          </div>
+        {/* 3. Typography */}
+        <div className="space-y-3">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
+            联系我
+          </h1>
+          <p className="text-slate-500 text-base leading-relaxed max-w-[280px] mx-auto">
+            很高兴认识您！如有任何问题，欢迎随时与我联系。
+          </p>
+        </div>
 
-          {/* Typography: Material 3 Display Styles */}
-          <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">
-              联系我
-            </h1>
-            <p className="text-lg text-slate-500 max-w-sm mx-auto leading-relaxed">
-              很高兴认识您！如有任何问题，欢迎随时与我联系。
-            </p>
-          </div>
+        {/* 4. Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full px-4 sm:px-0 pt-4">
+          {/* Dialog Trigger (Primary) */}
+          <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                className="flex-1 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 text-lg font-medium transition-all hover:shadow-xl hover:-translate-y-0.5"
+              >
+                <Send className="w-5 h-5 mr-2" />
+                立即联系
+                <ArrowRight className="w-5 h-5 ml-1 opacity-80" />
+              </Button>
+            </DialogTrigger>
 
-          {/* Actions: Material 3 Buttons (Fully Rounded) */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-            
-            <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
-              <DialogTrigger asChild>
-                {/* Primary Action: Filled Button (Rounded Full) */}
-                <Button 
-                  size="lg" 
-                  className="rounded-full px-8 py-6 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-300 text-base"
-                >
-                  <Send className="w-5 h-5 mr-2.5" />
-                  立即联系
-                  <ArrowRight className="w-4 h-4 ml-2 opacity-70" />
-                </Button>
-              </DialogTrigger>
-
-              {/* Dialog: Material 3 Alert Dialog style (Extra rounded corners) */}
-              <DialogContent className="sm:max-w-sm rounded-[28px] p-6 bg-white shadow-2xl border-0">
-                <DialogHeader className="space-y-3 pb-4">
-                  <div className="mx-auto w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-2">
-                     <Sparkles className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <DialogTitle className="text-xl font-semibold text-center text-slate-800">
+            {/* Dialog Content (Modal) */}
+            <DialogContent className="bg-white/95 backdrop-blur-xl rounded-[28px] p-0 gap-0 border-none shadow-2xl max-w-[340px] sm:max-w-md overflow-hidden">
+              
+              {/* Dialog Header Area */}
+              <div className="bg-blue-50/50 p-6 pb-4 text-center space-y-3">
+                <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                  <Sparkles className="w-6 h-6 text-blue-600" />
+                </div>
+                <DialogHeader className="space-y-1">
+                  <DialogTitle className="text-2xl font-bold text-slate-800 text-center">
                     专业服务团队
                   </DialogTitle>
-                  <DialogDescription className="text-center text-slate-500 text-base">
+                  <DialogDescription className="text-slate-500 text-center text-sm leading-relaxed">
                     我们的客服团队将为您提供<br/>一对一专业咨询服务
                   </DialogDescription>
                 </DialogHeader>
-
-                <div className="space-y-3">
-                  {[1, 2, 3].map((_, index) => (
-                    <a
-                      key={index}
-                      href="https://t.me/Facebookkf_bot"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50/80 border border-transparent hover:border-blue-100 transition-all duration-200 group"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <Send className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <div className="font-semibold text-slate-800">Telegram</div>
-                        <div className="text-sm text-slate-500">@Facebookkf_bot</div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-600 transition-colors" />
-                    </a>
-                  ))}
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            {/* Secondary Action: Outlined Button (Rounded Full) */}
-            <Button 
-              size="lg"
-              variant="outline"
-              onClick={() => navigate('/products')}
-              className="rounded-full px-8 py-6 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 transition-all duration-200 text-base"
-            >
-              <Package className="w-5 h-5 mr-2.5" />
-              查看商品
-            </Button>
-          </div>
-
-          {/* FAB-like Action (Small tool button) */}
-          <div className="pt-8">
-             <button
-              onClick={() => navigate('/tools')}
-              className="group relative p-4 rounded-2xl hover:bg-slate-100 transition-all duration-300"
-              aria-label="实用工具"
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm group-hover:shadow-md flex items-center justify-center transition-all">
-                    <Wrench className="w-5 h-5 text-slate-500 group-hover:text-blue-600 transition-colors" />
-                </div>
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-600 transition-colors">工具箱</span>
               </div>
-            </button>
-          </div>
 
+              {/* Contact List */}
+              <div className="p-4 space-y-2 bg-white">
+                {contactOptions.map((item, index) => (
+                  <a
+                    key={index}
+                    href="https://t.me/Facebookkf_bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-2xl hover:bg-blue-50 group transition-colors duration-200 cursor-pointer border border-transparent hover:border-blue-100"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                        <Send className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="font-semibold text-slate-800">Telegram</span>
+                        <span className="text-xs text-slate-500">@Facebookkf_bot</span>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
+                  </a>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Navigation Button (Secondary) */}
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/products')}
+            className="flex-1 h-14 rounded-full border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 text-lg font-medium transition-all"
+          >
+            <Package className="w-5 h-5 mr-2" />
+            查看商品
+          </Button>
         </div>
+      </main>
+
+      {/* 5. Footer / Floating Action */}
+      <div className="mt-12 sm:absolute sm:bottom-8 sm:right-8">
+        <button
+          onClick={() => navigate('/tools')}
+          className="group flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-white/50 rounded-full shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-50 flex items-center justify-center transition-colors">
+             <Wrench className="w-4 h-4 text-slate-500 group-hover:text-blue-600" />
+          </div>
+          <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 pr-1">
+            工具箱
+          </span>
+        </button>
       </div>
-    </main>
+
+    </div>
   );
 };
 
-export default Index;
+export default ContactMePage;
